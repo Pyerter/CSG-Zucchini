@@ -10,6 +10,8 @@ This document will contain description on large elements of the game. Those elem
 
 ### Art Style
 
+We have not yet decided on an actual art style for drawing.
+
 This game will be a 2D, side-view game with vector art. There will be great emphasis on particle effects and flashy movement. We will also try to make the game feel very smooth, in a way that it becomes entertaining just to move around.
 
 The main character will be customizable in only color and different aesthetic additions gained from certain skills. We will not include direct character customization to avoid heavy work in this area.
