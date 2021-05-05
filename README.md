@@ -1,5 +1,6 @@
 # CSG-Zucchini
-This is a small game that Porter Squires, Michael Zabrowski, Alex Zabrowski, and Nicholas Pautsch are going to be working on over a Summer.
+This is a small game will be worked on over the Summer in 2021.<br/>
+Collaborators: Porter Squires, Michael Zabrowski, Alex Zabrowski, and Nicholas Pautsch.
 
 
 ### Work Flow
