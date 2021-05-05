@@ -10,12 +10,12 @@ This document will contain description on large elements of the game. Those elem
 
 ### Art Style
 
-This game will be a 2D, side-view game with vector art.
+This game will be a 2D, side-view game with vector art. There will be great emphasis on particle effects.
 
 
 ### Gameplay
 
-The combat will mainly be hack-and-slash, but certain encounters will push the player to focus.
+The combat will mainly be hack-and-slash, but certain encounters will push the player to focus and use every tool in their arsenal.
 
 
 ### Customization
@@ -26,5 +26,7 @@ The skill tree will include a variety of abilities, ranging from small damage bo
 
 ### Story
 
-The setting will be in a sci-fi universe.
-Cool dude slays things. (WIP)
+The setting will be in a sci-fi universe. <br/>
+The plot will be, in very general terms, the protagonist was wronged by the antogonist and seeks justice. Due to the corrupt world, our character is the only one with the ability to carry out this justice.
+
+The protagonist had a child, who when they were very young, was taken away due to super-human traits that they developed. The justice our character seeks is the execution of the captors, the ones in charge, and the recovering of their child. To do this, our protagonist may have to cut down more than just a few opponents...
