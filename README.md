@@ -21,11 +21,19 @@ Master    Developer    Feature    Feature Patch
 Master __ /
 ```
 Whenever we merge a Feature branch into the Developer branch, we will use pull requests so that at least one other collaborator can check for merge conflicts. <br/>
-Feature Patches will be small enough there there should not be any merge conflicts.<br/>
-When we complete a Feature and merged it into Developer in a working state, we will delete the corresponding Feature branch. If we are to work on that Feature again, we will make another branch for that Feature with the same name.
+Feature Patches will be small enough there there should not be any merge conflicts. The benefit of using Feature Patch branches will allow more than one person to work on a Feature at the same time.<br/>
+When we complete a Feature and merged it into Developer in a working state, we will delete the corresponding Feature branch. If we are to work on that Feature again, we will make another branch for that Feature with the same name.<br/>
+
+Feature Naming Conventions:
+Ftr-feature-name
+
+Feature Patch Naming Conventions:
+Ftr-feature-name-Ptch-patch-name
 
 
-### Game Styles
+### Work Environments
 
-This game will be a 2D, side-view game. There will be mainly hack-and-slash combat, but certain encounters will push the player to focus.
-There will also be a skill tree, where certain skills will alter the visual appearance of the player.
+For building the game, we will be using the latest version of unity, currently: 2021.1.5f1.
+
+
+
