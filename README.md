@@ -1,5 +1,5 @@
 # CSG-Zucchini
-This is a small game will be worked on over the Summer in 2021.<br/>
+This is a small game that will be worked on over the Summer in 2021.<br/>
 Collaborators: Porter Squires, Michael Zabrowski, Alex Zabrowski, and Nicholas Pautsch.
 
 
@@ -23,3 +23,9 @@ Master __ /
 Whenever we merge a Feature branch into the Developer branch, we will use pull requests so that at least one other collaborator can check for merge conflicts. <br/>
 Feature Patches will be small enough there there should not be any merge conflicts.<br/>
 When we complete a Feature and merged it into Developer in a working state, we will delete the corresponding Feature branch. If we are to work on that Feature again, we will make another branch for that Feature with the same name.
+
+
+### Game Styles
+
+This game will be a 2D, side-view game. There will be mainly hack-and-slash combat, but certain encounters will push the player to focus.
+There will also be a skill tree, where certain skills will alter the visual appearance of the player.
