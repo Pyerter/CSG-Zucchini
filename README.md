@@ -6,6 +6,7 @@ This is a small game that Porter Squires, Michael Zabrowski, Alex Zabrowski, and
 
 Our Master Branch will act as the release branch and the structure will follow like so:
 
+```
 Master
    |  \__ Developer
    |          |    \__ Feature
@@ -18,3 +19,4 @@ Master    Developer    Feature    Feature Patch
    |          |        Feature __ /
    |      Developer __ /
 Master __ /
+```
