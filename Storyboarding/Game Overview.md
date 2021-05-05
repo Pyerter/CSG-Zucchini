@@ -2,7 +2,7 @@
 This document will contain description on large elements of the game. Those elements with a lot to discuss will have a link to their own documents, such as the story.
 
 #### Table of Contents
-1. [Art Style](https://github.com/pyerter/CSG-Zucchini/blob/master/storyboarding/Game%20Overview.md#Art-Style)
+1. [Art Style](https://github.com/pyerter/CSG-Zucchini/blob/master/storyboarding/Game%20Overview.md###Art-Style)
 1. [Gameplay](https://github.com/pyerter/CSG-Zucchini/blob/master/storyboarding/Game%20Overview.md#Gameplay)
 1. [Customization](https://github.com/pyerter/CSG-Zucchini/blob/master/storyboarding/Game%20Overview.md#Customization)
 1. [Story](https://github.com/pyerter/CSG-Zucchini/blob/master/storyboarding/Game%20Overview.md#Story)
