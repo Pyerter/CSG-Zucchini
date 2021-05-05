@@ -30,6 +30,8 @@ Ftr-feature-name
 Feature Patch Naming Conventions:
 Ftr-feature-name-Ptch-patch-name
 
+**REMINDER**: When you start working on this project at any point, please make sure that you have pulled the most recent commits and are working in the correct branch. If you fail to do this, it could result in merge conflicts that we do not want.
+
 
 ### Work Environments
 
