@@ -5,7 +5,7 @@ Collaborators: Porter Squires, Michael Zabrowski, Alex Zabrowski, and Nicholas P
 ##### Table of Contents
 1. [Work Flow](#Work-Flow)
 1. [Work Environments](#Work-Environments)
-1. [Game Overview](https://github.com/Pyerter/CSG-Zucchini/blob/master/_Storyboarding/Game%20Overview.md#overview)
+1. [Game Overview](https://github.com/Pyerter/CSG-Zucchini/blob/master/_Storyboarding/Game%20Overview.md)
 
 
 ### Work Flow
