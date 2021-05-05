@@ -19,6 +19,6 @@ Master    Developer    Feature    Feature Patch
    |      Developer __ /
 Master __ /
 ```
-Whenever we merge a Feature branch into the Developer branch, we will use pull requests so that at least one other collaborator can check for merge conflicts. 
-Feature Patches will be small enough there there should not be any merge conflicts.
+Whenever we merge a Feature branch into the Developer branch, we will use pull requests so that at least one other collaborator can check for merge conflicts. <br/>
+Feature Patches will be small enough there there should not be any merge conflicts.<br/>
 When we complete a Feature and merged it into Developer in a working state, we will delete the corresponding Feature branch. If we are to work on that Feature again, we will make another branch for that Feature with the same name.
