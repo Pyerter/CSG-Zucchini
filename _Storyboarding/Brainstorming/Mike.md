@@ -4,3 +4,8 @@ Progression:
 Weapons:
   1. Scythe:
     - Hold like Odyssey Kayn
+
+Attack Style:
+  1. Slide Attacks:
+    - I-Frames?
+    - Area around/in-front of character
