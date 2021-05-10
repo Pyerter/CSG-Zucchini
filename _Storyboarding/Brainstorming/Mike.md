@@ -7,6 +7,9 @@ Progression:
 Weapons:
   1. Scythe:
     - Hold like Odyssey Kayn
+  2. Panic Button Weapon:
+    - Very limited usage. 
+    - Like BFG or Crucible in Doom
 
 Attacks:
   1. Slide Attacks:
