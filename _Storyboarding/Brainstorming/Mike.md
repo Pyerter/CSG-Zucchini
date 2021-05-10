@@ -12,9 +12,13 @@ Attacks:
   1. Slide Attacks:
     - I-Frames?
     - Area around/in-front of character
-  2. Abilities:
-    - Cooldown or resource pools?
 
 Skill Tree:
   1. Weapon Skill Tree
   2. Character Skill Tree
+
+
+Abilities:
+  1. Abilities:
+    - Cooldown or resource pools?
+    - Some type of visor (heat/predator vision/x-ray)
