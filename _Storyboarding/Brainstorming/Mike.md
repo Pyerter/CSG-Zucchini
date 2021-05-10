@@ -3,4 +3,4 @@ Progression:
  
 Weapons:
   1. Scythe:
-    1. Hold like Odyssey Kayn
+    - Hold like Odyssey Kayn
