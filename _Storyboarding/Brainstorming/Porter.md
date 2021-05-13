@@ -15,6 +15,7 @@ Sections:
 1. Primary Section (standard movement/combat/resource upgrades, biggest section)
 1. Boost Pack (increased jump height and dash to side)
 1. Mini-nuke (handheld grenade that annihalates everything on screen)
+1. Grapple (ranged grapple than can pull things or swing on)
 
 I want it to be possible to do nuke-only runs.
 
@@ -25,7 +26,7 @@ Each weapon will have different versions more powerful than the other, in order 
 Note: while walking around, the player holds a handheld device that accepts a chip that synthesizing the corresponding weapon on attack. <br/>
 Weapon Categories:
 1. Scythe
-1. Gauntlet
+1. Gauntlet (will have grapple/claw interactions)
 1. Sword
 1. Greatsword
 
