@@ -16,6 +16,7 @@ Sections:
 1. Boost Pack (increased jump height and dash to side)
 1. Mini-nuke (handheld grenade that annihalates everything on screen)
 1. Grapple (ranged grapple than can pull things or swing on)
+1. Wall-Snap (
 
 I want it to be possible to do nuke-only runs.
 
