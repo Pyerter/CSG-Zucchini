@@ -3,39 +3,49 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
+// This class is adapted and based off of Brackeys' CharacterController: https://github.com/Brackeys/2D-Character-Controller/blob/master/CharacterController2D.cs
 public class PlayerController : MonoBehaviour
 {
+    // Speed variables
     [SerializeField] private float m_JumpSpeed = 15f;
     [Range(0, 1)] [SerializeField] private float m_CrouchSpeed = 0.36f;
     [Range(0, 0.3f)] [SerializeField] private float m_MovementSmoothing = 0.05f;
+    // Air control and jumps
     [SerializeField] private bool m_AirControl = false;
     [SerializeField] int m_MaxJumps = 1;
+    // Layers to collide with
     [SerializeField] private LayerMask m_WhatIsGround;
+    // Transforms for reference
     [SerializeField] private Transform m_GroundCheck;
     [SerializeField] private Transform m_CeilingCheck;
     [SerializeField] private Transform m_RightWallCheck;
     [SerializeField] private Transform m_LeftWallCheck;
 
-    const float k_GroundedRadius = 0.2f;
-    [HideInInspector] public bool m_Grounded;
-    private int m_remainingJumps = 1;
-    private bool jumping = false;
-    private bool holdingJumpInput = false;
-    const float k_CeilingRadius = 0.2f;
-    private Rigidbody2D m_RigidBody2D;
-    private bool m_FacingRight = true;
-    private Vector3 m_Velocity = Vector3.zero;
 
+    const float k_GroundedRadius = 0.2f; // Grounded detection radius
+    [HideInInspector] public bool m_Grounded; // Is grounded
+
+    private int m_remainingJumps = 1; // Jumps remaining
+    private bool holdingJumpInput = false; // If player is holding jump input
+
+    const float k_CeilingRadius = 0.2f; // Ceiling detection radius
+
+    private Rigidbody2D m_RigidBody2D; // The RigibBody2D to use for velocity
+
+    private bool m_FacingRight = true; // Player is facing right
+    private Vector3 m_Velocity = Vector3.zero; // The movement velocity
+
+    // List of events
     [Header("Events")]
     [Space]
 
-    public UnityEvent onLandEvent;
+    public UnityEvent onLandEvent; // landing events
 
     [System.Serializable]
     public class BoolEvent : UnityEvent<bool> { }
 
-    public BoolEvent OnCrouchEvent;
-    private bool m_WasCrouching = false;
+    public BoolEvent OnCrouchEvent; // Bool event for crouch
+    private bool m_WasCrouching = false; // was crouching
 
     // When this object awakes
     private void Awake()
@@ -57,6 +67,11 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        CheckGrounded();
+    }
+
+    private void CheckGrounded()
+    {
         // Establish if player was grounded
         bool wasGrounded = m_Grounded;
         m_Grounded = false;
@@ -76,7 +91,6 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
-
     }
 
     // This method acts as movement input for the player
