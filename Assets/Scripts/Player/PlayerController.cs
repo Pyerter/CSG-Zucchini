@@ -186,7 +186,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // if player no longer wants to jump
-        if (!jump)
+        if (!jump && !m_Grounded)
         {
             // they stop holding the jump input
             holdingJumpInput = false;
