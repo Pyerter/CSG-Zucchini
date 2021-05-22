@@ -22,15 +22,17 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform m_LeftWallCheck;
 
 
-    const float k_GroundedRadius = 0.2f; // Grounded detection radius
+    const float k_GroundedRadius = 0.4f; // Grounded detection radius
     [HideInInspector] public bool m_Grounded; // Is grounded
 
     private int m_RemainingJumps = 1; // Jumps remaining
     private bool m_HoldingJumpInput = false; // If player is holding jump input
     private float m_JumpTime = 0f; // time the player jumped
-    [SerializeField] private const float m_JumpStopDelay = 0.1f; // time the player can stop inputting jump after jumping
+    [SerializeField] private float k_JumpStopDelay = 0.1f; // time the player can stop inputting jump after jumping
+    private float m_GroundedTime = 0f;
+    [SerializeField] private float k_GroundedDelay = 0.05f; // 
 
-    const float k_CeilingRadius = 0.2f; // Ceiling detection radius
+    const float k_CeilingRadius = 0.3f; // Ceiling detection radius
 
     private Rigidbody2D m_RigidBody2D; // The RigibBody2D to use for velocity
 
@@ -92,6 +94,11 @@ public class PlayerController : MonoBehaviour
                     onLandEvent.Invoke();
                 }
             }
+        }
+
+        if (wasGrounded)
+        {
+            m_GroundedTime = Time.time + k_GroundedDelay;
         }
     }
 
@@ -166,7 +173,7 @@ public class PlayerController : MonoBehaviour
         Vector3 velocity = m_RigidBody2D.velocity;
 
         // if the player is grounded, wants to jump, has remaining jump, and is not holding jump input from previous jump
-        if (m_Grounded && jump && m_RemainingJumps > 0 && !m_HoldingJumpInput)
+        if (Time.time < m_GroundedTime && jump && m_RemainingJumps > 0 && !m_HoldingJumpInput)
         {
             // set grounded to false, as player is jumping
             m_Grounded = false;
@@ -178,10 +185,10 @@ public class PlayerController : MonoBehaviour
             // reduce remaining jumps and set jumping true, player starts holding a new jump input
             m_RemainingJumps--;
             m_HoldingJumpInput = true;
-            m_JumpTime = Time.time + m_JumpStopDelay;
+            m_JumpTime = Time.time + k_JumpStopDelay;
         }
         // if the player is going up, is not grounded, is not putting jump input, but was holding jump previously
-        else if (velocity.y > 0 && !m_Grounded && !jump && m_HoldingJumpInput)
+        else if (velocity.y > 0 && Time.time > m_GroundedTime && !jump && m_HoldingJumpInput)
         {
             // set upwards velocity to 0
             velocity.y = 0f;
