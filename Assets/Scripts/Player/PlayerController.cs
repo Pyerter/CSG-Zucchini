@@ -8,7 +8,7 @@ public class PlayerController : MonoBehaviour
 {
     // Speed variables
     [SerializeField] private float m_JumpSpeed = 15f;
-    [Range(0, 1)] [SerializeField] private float m_CrouchSpeed = 0.36f;
+    [Range(0, 1)] [SerializeField] private float m_CrouchSpeed = 0.5f;
     [Range(0, 0.3f)] [SerializeField] private float m_MovementSmoothing = 0.05f;
     // Air control and jumps
     [SerializeField] private bool m_AirControl = false;
@@ -25,8 +25,10 @@ public class PlayerController : MonoBehaviour
     const float k_GroundedRadius = 0.2f; // Grounded detection radius
     [HideInInspector] public bool m_Grounded; // Is grounded
 
-    private int m_remainingJumps = 1; // Jumps remaining
-    private bool holdingJumpInput = false; // If player is holding jump input
+    private int m_RemainingJumps = 1; // Jumps remaining
+    private bool m_HoldingJumpInput = false; // If player is holding jump input
+    private float m_JumpTime = 0f; // time the player jumped
+    [SerializeField] private const float m_JumpStopDelay = 0.1f; // time the player can stop inputting jump after jumping
 
     const float k_CeilingRadius = 0.2f; // Ceiling detection radius
 
@@ -100,7 +102,7 @@ public class PlayerController : MonoBehaviour
         if (!crouch)
         {
             // if an object is colliding with the ceiling check and player is not in air, start crouching
-            if (!m_Grounded && Physics2D.OverlapCircle(m_CeilingCheck.position, k_CeilingRadius, m_WhatIsGround))
+            if (m_Grounded && Physics2D.OverlapCircle(m_CeilingCheck.position, k_CeilingRadius, m_WhatIsGround))
             {
                 crouch = true;
             }
@@ -109,7 +111,7 @@ public class PlayerController : MonoBehaviour
         // if player is grounded, reset their remaining jumps
         if (m_Grounded)
         {
-            m_remainingJumps = m_MaxJumps;
+            m_RemainingJumps = m_MaxJumps;
         }
 
         // allow horizontal movement if grounded or player has air control
@@ -164,7 +166,7 @@ public class PlayerController : MonoBehaviour
         Vector3 velocity = m_RigidBody2D.velocity;
 
         // if the player is grounded, wants to jump, has remaining jump, and is not holding jump input from previous jump
-        if (m_Grounded && jump && m_remainingJumps > 0 && !holdingJumpInput)
+        if (m_Grounded && jump && m_RemainingJumps > 0 && !m_HoldingJumpInput)
         {
             // set grounded to false, as player is jumping
             m_Grounded = false;
@@ -174,11 +176,12 @@ public class PlayerController : MonoBehaviour
             m_RigidBody2D.velocity = velocity;
 
             // reduce remaining jumps and set jumping true, player starts holding a new jump input
-            m_remainingJumps--;
-            holdingJumpInput = true;
+            m_RemainingJumps--;
+            m_HoldingJumpInput = true;
+            m_JumpTime = Time.time + m_JumpStopDelay;
         }
         // if the player is going up, is not grounded, is not putting jump input, but was holding jump previously
-        else if (velocity.y > 0 && !m_Grounded && !jump && holdingJumpInput)
+        else if (velocity.y > 0 && !m_Grounded && !jump && m_HoldingJumpInput)
         {
             // set upwards velocity to 0
             velocity.y = 0f;
@@ -186,10 +189,10 @@ public class PlayerController : MonoBehaviour
         }
 
         // if player no longer wants to jump
-        if (!jump && !m_Grounded)
+        if (!jump && Time.time > m_JumpTime)
         {
             // they stop holding the jump input
-            holdingJumpInput = false;
+            m_HoldingJumpInput = false;
         }
 
     }
