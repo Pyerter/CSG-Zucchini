@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -15,12 +14,16 @@ public class PlayerController : MonoBehaviour
     [SerializeField] int m_MaxJumps = 1;
     // Layers to collide with
     [SerializeField] private LayerMask m_WhatIsGround;
-    // Transforms for reference
+    [SerializeField] public LayerMask m_WhatIsPunched;
+    // Component/Object references
     [SerializeField] private Transform m_GroundCheck;
     [SerializeField] private Transform m_CeilingCheck;
     [SerializeField] private Transform m_RightWallCheck;
     [SerializeField] private Transform m_LeftWallCheck;
     [SerializeField] private ParticleSystem m_WalkingDust;
+    [SerializeField] private Animator m_Animator;
+    // Hit Box object references for attacks
+    [SerializeField] private GameObject m_Fists;
 
 
     const float k_GroundedRadius = 0.4f; // Grounded detection radius
@@ -37,20 +40,38 @@ public class PlayerController : MonoBehaviour
 
     private Rigidbody2D m_RigidBody2D; // The RigibBody2D to use for velocity
 
+    public enum Weapon
+    {
+        Fist,
+        Scythe,
+        Sword,
+        Greatsword
+    };
+    private Weapon m_EquippedWeapon;
+
     private bool m_FacingRight = true; // Player is facing right
     private Vector3 m_Velocity = Vector3.zero; // The movement velocity
 
     // List of events
     [Header("Events")]
     [Space]
-
     public UnityEvent onLandEvent; // landing events
-
     [System.Serializable]
     public class BoolEvent : UnityEvent<bool> { }
-
     public BoolEvent OnCrouchEvent; // Bool event for crouch
     private bool m_WasCrouching = false; // was crouching
+    // Smaller events/delegates
+    public Action m_OnAttackIdle; // end of attack event
+
+    private void Start()
+    {
+        if (m_Animator == null)
+        {
+            m_Animator = GetComponent<Animator>();
+        }
+
+        m_EquippedWeapon = Weapon.Fist;
+    }
 
     // When this object awakes
     private void Awake()
@@ -73,6 +94,7 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         CheckGrounded();
+        CheckAttackState();
     }
 
     private void CheckGrounded()
@@ -234,5 +256,46 @@ public class PlayerController : MonoBehaviour
         particleScale.x *= -1;
         m_WalkingDust.transform.localScale = particleScale;
     }
+
+    // Command the player to attack
+    public void Attack(int dir)
+    {
+        if (m_Animator.GetCurrentAnimatorStateInfo(1).IsName("Idle"))
+        {
+            switch (m_EquippedWeapon)
+            {
+                default:
+                case Weapon.Fist:
+                    if (m_Fists != null)
+                    {
+                        Action disableFist = () => m_Fists.SetActive(false);
+                        m_OnAttackIdle += disableFist;
+                    }
+                    m_Fists.SetActive(true);
+                    m_Animator.SetInteger("AttackType", 0);
+                    break;
+            }
+            m_Animator.SetTrigger("NormalAttack");
+        }
+    }
+
+    public void CheckAttackState()
+    {
+        if (m_Animator.GetCurrentAnimatorStateInfo(1).IsName("Idle") && !m_Animator.GetBool("NormalAttack"))
+        {
+            if (m_OnAttackIdle != null)
+            {
+                m_OnAttackIdle();
+                m_OnAttackIdle = null;
+            }
+        }
+    }
+
+    // Command the player to equip a weapon
+    public void EquipWeapon(Weapon weap)
+    {
+        m_EquippedWeapon = weap;
+    }
+    
 
 }

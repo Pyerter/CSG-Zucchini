@@ -12,6 +12,8 @@ public class PlayerMovement : MonoBehaviour
 
     private bool requestJump = false;
 
+    private bool requestingNormalAttack = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -33,6 +35,12 @@ public class PlayerMovement : MonoBehaviour
         {
             requestJump = false;
         }
+
+        // grab the value if player is doing normal attack
+        if (Input.GetButtonDown("Fire1"))
+        {
+            requestingNormalAttack = true;
+        }
     }
 
     // FixedUpdate is called a fixed amount of times per second: ?
@@ -40,5 +48,11 @@ public class PlayerMovement : MonoBehaviour
     {
         // pass in movement values (horizontalMove modified by fixedDeltaTime to properly calculate moveSpeed as moveSpeed per second)
         controller.Move(horizontalMove * Time.fixedDeltaTime, requestJump, false);
+
+        if (requestingNormalAttack)
+        {
+            controller.Attack(0);
+            requestingNormalAttack = false;
+        }
     }
 }
