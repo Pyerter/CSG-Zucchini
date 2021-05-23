@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform m_CeilingCheck;
     [SerializeField] private Transform m_RightWallCheck;
     [SerializeField] private Transform m_LeftWallCheck;
+    [SerializeField] private ParticleSystem m_WalkingDust;
 
 
     const float k_GroundedRadius = 0.4f; // Grounded detection radius
@@ -99,6 +100,19 @@ public class PlayerController : MonoBehaviour
         if (wasGrounded)
         {
             m_GroundedTime = Time.time + k_GroundedDelay;
+        }
+
+        if (m_WalkingDust != null)
+        {
+            if (m_Grounded && !m_WalkingDust.isPlaying)
+            {
+                m_WalkingDust.Play();
+                Debug.Log("Playing");
+            } else if (!m_Grounded && m_WalkingDust.isPlaying)
+            {
+                m_WalkingDust.Stop();
+                Debug.Log("Stopping");
+            }
         }
     }
 
@@ -214,6 +228,11 @@ public class PlayerController : MonoBehaviour
         Vector3 theScale = transform.localScale;
         theScale.x *= -1;
         transform.localScale = theScale;
+
+        // reverse scale of other things
+        Vector3 particleScale = m_WalkingDust.transform.localScale;
+        particleScale.x *= -1;
+        m_WalkingDust.transform.localScale = particleScale;
     }
 
 }
