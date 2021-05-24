@@ -37,4 +37,16 @@ public class Utility : MonoBehaviour
             return -Mathf.RoundToInt(Math.Abs(value) * snap) / snap;
         }
     }
+    
+    // find radian angle
+    public static float AngleInRad(Vector3 vec1, Vector3 vec2)
+    {
+        return Mathf.Atan2(vec2.y - vec1.y, vec2.x - vec1.x);
+    }
+
+    // find degree angle
+    public static float AngleInDeg(Vector3 vec1, Vector3 vec2)
+    {
+        return Mathf.Atan2(vec2.y - vec1.y, vec2.x - vec1.x) * 180 / Mathf.PI;
+    }
 }

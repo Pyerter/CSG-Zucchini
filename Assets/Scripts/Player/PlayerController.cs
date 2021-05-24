@@ -1,4 +1,4 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -7,51 +7,111 @@ using UnityEngine.Events;
 public class PlayerController : MonoBehaviour
 {
     // Speed variables
-    [SerializeField] private float m_JumpSpeed = 15f;
-    [Range(0, 1)] [SerializeField] private float m_CrouchSpeed = 0.36f;
+    [SerializeField] private float m_RunSpeed = 10f;
+    [SerializeField] private float m_JumpSpeed = 18f;
+    [SerializeField] private float m_BounceSpeed = 14f;
+    [SerializeField] private float m_DashSpeed = 40f;
+    [SerializeField] private float m_WallSlideSpeed = 5f;
+    [SerializeField] private float m_GrappleMaxSpeed = 60f;
+    [SerializeField] private float m_GrappleSpeedAccelerate = 0.2f;
+    [Range(0, 1)] [SerializeField] private float m_CrouchSpeed = 0.5f;
     [Range(0, 0.3f)] [SerializeField] private float m_MovementSmoothing = 0.05f;
+    [Range(0, 0.5f)] [SerializeField] private float m_RotationLerp = 0.1f;
+    private float m_GravMod; // value stores the grav mod for the rigidbody
+    private Vector3 m_Velocity = Vector3.zero; // The movement velocity
+    private Quaternion m_TargetRotation;
+
     // Air control and jumps
     [SerializeField] private bool m_AirControl = false;
     [SerializeField] int m_MaxJumps = 1;
+    [SerializeField] int m_MaxDashes = 1;
+    private int m_RemainingJumps = 1; // Jumps remaining
+    private int m_RemainingDashes = 1; // Dashes remaining
+
     // Layers to collide with
     [SerializeField] private LayerMask m_WhatIsGround;
-    // Transforms for reference
+    [SerializeField] public LayerMask m_WhatIsPunched;
+    [SerializeField] private LayerMask m_WhatIsGrappled;
+
+    // Component/Object references
     [SerializeField] private Transform m_GroundCheck;
     [SerializeField] private Transform m_CeilingCheck;
     [SerializeField] private Transform m_RightWallCheck;
     [SerializeField] private Transform m_LeftWallCheck;
+    [SerializeField] public Transform m_GrappleGun;
 
-
-    const float k_GroundedRadius = 0.2f; // Grounded detection radius
-    [HideInInspector] public bool m_Grounded; // Is grounded
-
-    private int m_remainingJumps = 1; // Jumps remaining
-    private bool holdingJumpInput = false; // If player is holding jump input
-
-    const float k_CeilingRadius = 0.2f; // Ceiling detection radius
-
+    [SerializeField] private ParticleSystem m_WalkingDust;
+    [SerializeField] private Animator m_Animator;
     private Rigidbody2D m_RigidBody2D; // The RigibBody2D to use for velocity
 
+    [SerializeField] private GameObject m_Fists;
+
+    // Dynamic references
+    private GrappleHinge m_GrappleHinge;
+
+    // Size variables
+    const float k_GroundedRadius = 0.4f; // Grounded detection radius
+    const float k_WalledRadius = 0.1f; // Radius to detect wall latching
+    const float k_CeilingRadius = 0.3f; // Ceiling detection radius
+    const float k_GrappleRadius = 8f; // radius where the player can grapple within
+
+    // State variables
+    [HideInInspector] public bool m_Grounded; // Is grounded
+    private bool m_HoldingJumpInput = false; // If player is holding jump input
     private bool m_FacingRight = true; // Player is facing right
-    private Vector3 m_Velocity = Vector3.zero; // The movement velocity
+    private bool m_WasCrouching = false; // was crouching
+    private bool m_WasDashing = false; // if the player was dashing in the previous frame
+    private bool m_WasGrappling = false; // if the player was grappling
+    private bool m_WasWalled = false; // if the player was wall latching
+    private bool m_ShouldBounce = false; // if this is true, the player's y velocity will be bounced up
+    public bool m_HasBounced = false; // if the controller already bounced and should not
+
+    // Timer variables
+    private float m_JumpTime = 0f; // time the player jumped
+    [SerializeField] private float k_JumpStopDelay = 0.1f; // time the player can stop inputting jump after jumping
+    private float m_GroundedTime = 0f; // time player is grounded until
+    [SerializeField] private float k_GroundedDelay = 0.05f; // delay to remain grounded after collider doesn't touch ground
+    private float m_DashRefreshedTime = 0f; // Time the player is able to dash after cooldown
+    [SerializeField] private float m_DashCooldown = 0.25f; // Time player must wait to dash again
+
+    // Variables conerning attack states
+    public enum Weapon
+    {
+        Fist,
+        Scythe,
+        Sword,
+        Greatsword
+    };
+    private Weapon m_EquippedWeapon;
+
 
     // List of events
     [Header("Events")]
     [Space]
-
     public UnityEvent onLandEvent; // landing events
-
-    [System.Serializable]
-    public class BoolEvent : UnityEvent<bool> { }
-
+    [System.Serializable] public class BoolEvent : UnityEvent<bool> { } // class to store bool event
     public BoolEvent OnCrouchEvent; // Bool event for crouch
-    private bool m_WasCrouching = false; // was crouching
+
+    // Smaller events/delegates
+    public Action m_OnAttackIdle; // end of attack event
+
+    // Variables pertaining to the ability to do stuff
+    private bool u_CanDash = true;
+    private bool u_CanWallLatch = true;
+    private bool u_CanGrapple = true;
+    // - - -
 
     // When this object awakes
     private void Awake()
     {
         // find the RigidBody2D component
         m_RigidBody2D = GetComponent<Rigidbody2D>();
+        m_GravMod = m_RigidBody2D.gravityScale;
+        // make sure the animator is present
+        if (m_Animator == null)
+        {
+            m_Animator = GetComponent<Animator>();
+        }
 
         // set null events to non-null
         if (onLandEvent == null)
@@ -62,12 +122,18 @@ public class PlayerController : MonoBehaviour
         {
             OnCrouchEvent = new BoolEvent();
         }
+
+        // set default values
+        m_EquippedWeapon = Weapon.Fist;
+        m_TargetRotation = transform.rotation;
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
         CheckGrounded();
+        CheckAttackState();
+        CheckRotation();
     }
 
     private void CheckGrounded()
@@ -91,16 +157,39 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
+
+        m_Animator.SetBool("Grounded", m_Grounded);
+        if (wasGrounded)
+        {
+            m_GroundedTime = Time.time + k_GroundedDelay;
+        }
+
+        if (m_WalkingDust != null)
+        {
+            if (m_Grounded && !m_WalkingDust.isPlaying)
+            {
+                m_WalkingDust.Play();
+            } else if (!m_Grounded && m_WalkingDust.isPlaying)
+            {
+                m_WalkingDust.Stop();
+            }
+        }
     }
 
     // This method acts as movement input for the player
-    public void Move(float move, bool jump, bool crouch)
+    public void Move(float move, float verticalMove, bool jump, bool crouch)
     {
+        if (verticalMove > 0)
+            verticalMove = 1;
+        else if (verticalMove < 0)
+            verticalMove = -1;
+        int vertMove = (int)verticalMove;
+
         // if the player does not want to crouch
         if (!crouch)
         {
             // if an object is colliding with the ceiling check and player is not in air, start crouching
-            if (!m_Grounded && Physics2D.OverlapCircle(m_CeilingCheck.position, k_CeilingRadius, m_WhatIsGround))
+            if (m_Grounded && Physics2D.OverlapCircle(m_CeilingCheck.position, k_CeilingRadius, m_WhatIsGround))
             {
                 crouch = true;
             }
@@ -109,89 +198,204 @@ public class PlayerController : MonoBehaviour
         // if player is grounded, reset their remaining jumps
         if (m_Grounded)
         {
-            m_remainingJumps = m_MaxJumps;
+            RefreshMovement();
         }
 
-        // allow horizontal movement if grounded or player has air control
-        if (m_Grounded || m_AirControl)
+
+        HorizontalMovement(move, vertMove, crouch);
+
+        VerticalMovement(jump);
+
+        CheckGrappleEnd();
+
+    }
+
+    private void HorizontalMovement(float move, int verticalMovement, bool crouch)
+    {
+        bool dashing = CheckDashing();
+
+        bool canMoveSides = !dashing && (m_Grounded || m_AirControl);
+
+        if (canMoveSides)
         {
+            CheckRun(move, crouch);
+        }
 
-            // if player is crouching
-            if (crouch)
-            {
-                // if the player was not just crouching
-                if (!m_WasCrouching)
-                {
-                    // invoke the crouch event
-                    m_WasCrouching = true;
-                    OnCrouchEvent.Invoke(true);
-                }
+        // Check flips
+        // if the player is moving right and not facing right, flip
+        if (move > 0 && !m_FacingRight)
+        {
+            Flip();
+        }
+        // if the player is moving left and facing right, flip
+        else if (move < 0 && m_FacingRight)
+        {
+            Flip();
+        }
 
-                // multiply speed by crouch speed modifier
-                move *= m_CrouchSpeed;
+        CheckWalled(verticalMovement);
 
-            } 
-            else
-            {
-                // if the player was crouching
-                if (m_WasCrouching)
-                {
-                    // set and invoke the uncrouch event
-                    m_WasCrouching = false;
-                    OnCrouchEvent.Invoke(false);
-                }
-            }
+        m_Animator.SetFloat("Speed", Math.Abs(m_RigidBody2D.velocity.x));
+    }
 
-            // set the target horizontal velocity
-            Vector3 targetVelocity = new Vector2(move * 10f, m_RigidBody2D.velocity.y);
-            // smooth towards it
-            m_RigidBody2D.velocity = Vector3.SmoothDamp(m_RigidBody2D.velocity, targetVelocity, ref m_Velocity, m_MovementSmoothing);
+    // returns if the player is currently dashing
+    private bool CheckDashing()
+    {
+        bool dashing = m_Animator.GetCurrentAnimatorStateInfo(0).IsName("Dash");
 
-            // if the player is moving right and not facing right, flip
-            if (move > 0 && !m_FacingRight)
-            {
-                Flip();
-            } 
-            // if the player is moving left and facing right, flip
-            else if (move < 0 && m_FacingRight)
+        if (dashing && !m_WasDashing)
+        {
+            if (m_WasWalled)
             {
                 Flip();
             }
+            float dirMod = 1;
+            if (!m_FacingRight)
+            {
+                dirMod = -1;
+            }
+            m_RigidBody2D.velocity = new Vector2(m_DashSpeed * dirMod, 0f);
+            m_RigidBody2D.gravityScale = 0f;
 
         }
+        else if (!dashing && m_WasDashing)
+        {
+            EndDashing();
+        }
+
+        m_WasDashing = dashing;
+
+        return dashing;
+    }
+
+    private void EndDashing()
+    {
+        m_RigidBody2D.gravityScale = m_GravMod;
+        m_DashRefreshedTime = Time.time + m_DashCooldown;
+    }
+
+    private void CheckRun(float move, bool crouch)
+    {
+        // if player is crouching
+        if (crouch)
+        {
+            // if the player was not just crouching
+            if (!m_WasCrouching)
+            {
+                // invoke the crouch event
+                m_WasCrouching = true;
+                OnCrouchEvent.Invoke(true);
+            }
+            // multiply speed by crouch speed modifier
+            move *= m_CrouchSpeed;
+        }
+        else
+        {
+            // if the player was crouching
+            if (m_WasCrouching)
+            {
+                // set and invoke the uncrouch event
+                m_WasCrouching = false;
+                OnCrouchEvent.Invoke(false);
+            }
+        }
+
+        // Modify the x velocity based on grapple or not
+        float xVelocity = move;
+        if (!m_WasGrappling)
+        {
+            xVelocity = xVelocity * m_RunSpeed;
+        } else
+        {
+            xVelocity = xVelocity * m_GrappleSpeedAccelerate + m_RigidBody2D.velocity.x;
+            if (Math.Abs(xVelocity) > m_GrappleMaxSpeed)
+            {
+                if (xVelocity < 0)
+                    xVelocity = -m_GrappleMaxSpeed;
+                else
+                    xVelocity = m_GrappleMaxSpeed;
+            }
+        }
+        // set the target horizontal velocity
+        Vector3 targetVelocity = new Vector2(xVelocity, m_RigidBody2D.velocity.y);
+        // smooth towards it
+        m_RigidBody2D.velocity = Vector3.SmoothDamp(m_RigidBody2D.velocity, targetVelocity, ref m_Velocity, m_MovementSmoothing);
+    }
+
+    private void VerticalMovement(bool jump)
+    {
 
         // grab the velocity vector
         Vector3 velocity = m_RigidBody2D.velocity;
 
-        // if the player is grounded, wants to jump, has remaining jump, and is not holding jump input from previous jump
-        if (m_Grounded && jump && m_remainingJumps > 0 && !holdingJumpInput)
+        // Check if the player can input jumps or fast falls
+        bool jumpLocked = m_WasDashing || m_WasGrappling || m_ShouldBounce;
+        if (!jumpLocked)
         {
-            // set grounded to false, as player is jumping
-            m_Grounded = false;
+            // Check for valid jumps or fast falls
+            bool canJump = (m_WasWalled || Time.time < m_GroundedTime || m_RemainingJumps > 0) && jump && !m_HoldingJumpInput;
+            bool willExtraJump = m_RemainingJumps > 0 && Time.time > m_GroundedTime && !m_WasWalled;
+            bool canFastFall = velocity.y > 0 && Time.time > m_GroundedTime && !jump && m_HoldingJumpInput;
 
-            // set upwards velocity
-            velocity.y = m_JumpSpeed;
-            m_RigidBody2D.velocity = velocity;
+            // if the player is grounded, wants to jump, has remaining jump, and is not holding jump input from previous jump
+            if (canJump)
+            {
+                // set grounded to false, as player is jumping
+                m_Grounded = false;
 
-            // reduce remaining jumps and set jumping true, player starts holding a new jump input
-            m_remainingJumps--;
-            holdingJumpInput = true;
+                // set upwards velocity
+                velocity.y = m_JumpSpeed;
+                if (m_WasWalled)
+                {
+                    if (m_FacingRight)
+                        velocity.x = -m_DashSpeed;
+                    else
+                        velocity.x = m_DashSpeed;
+                }
+                m_RigidBody2D.velocity = velocity;
+
+                // reduce remaining jumps and set jumping true, player starts holding a new jump input
+                if (willExtraJump)
+                    m_RemainingJumps--;
+                m_HoldingJumpInput = true;
+                m_JumpTime = Time.time + k_JumpStopDelay;
+                m_Animator.SetBool("Jumping", true);
+            }
+            // if the player is going up, is not grounded, is not putting jump input, but was holding jump previously
+            else if (canFastFall)
+            {
+                // set upwards velocity to 0
+                velocity.y = 0f;
+                m_RigidBody2D.velocity = velocity;
+            }
         }
-        // if the player is going up, is not grounded, is not putting jump input, but was holding jump previously
-        else if (velocity.y > 0 && !m_Grounded && !jump && holdingJumpInput)
+
+        if (m_ShouldBounce && !m_HasBounced)
         {
-            // set upwards velocity to 0
-            velocity.y = 0f;
-            m_RigidBody2D.velocity = velocity;
+            m_RigidBody2D.velocity = new Vector2(m_RigidBody2D.velocity.x, m_BounceSpeed);
+            m_ShouldBounce = false;
+            RefreshMovement();
+            m_HasBounced = true;
         }
 
-        // if player no longer wants to jump
-        if (!jump && !m_Grounded)
+        // check inputs, if player no longer wants to jump
+        if (!jump && Time.time > m_JumpTime)
         {
             // they stop holding the jump input
-            holdingJumpInput = false;
+            m_HoldingJumpInput = false;
         }
 
+        if (m_RigidBody2D.velocity.y < 0)
+        {
+            m_Animator.SetBool("Jumping", false);
+        }
+
+    }
+
+    private void RefreshMovement()
+    {
+        m_RemainingJumps = m_MaxJumps;
+        m_RemainingDashes = m_MaxDashes;
     }
 
     // Flip the player
@@ -204,6 +408,192 @@ public class PlayerController : MonoBehaviour
         Vector3 theScale = transform.localScale;
         theScale.x *= -1;
         transform.localScale = theScale;
+
+        // reverse scale of other things
+        Vector3 particleScale = m_WalkingDust.transform.localScale;
+        particleScale.x *= -1;
+        m_WalkingDust.transform.localScale = particleScale;
     }
 
+    // Command the player to attack
+    public void Attack(int dir)
+    {
+        bool attackLocked = m_WasWalled || m_WasGrappling || m_WasDashing || !m_Animator.GetCurrentAnimatorStateInfo(1).IsName("Idle");
+        if (!attackLocked)
+        {
+            switch (m_EquippedWeapon)
+            {
+                default:
+                case Weapon.Fist:
+                    if (m_Fists != null)
+                    {
+                        Action disableFist = () => m_Fists.SetActive(false);
+                        m_OnAttackIdle += disableFist;
+                    }
+                    m_Fists.SetActive(true);
+                    m_Animator.SetInteger("AttackType", 0);
+                    if (m_Grounded && dir == -1)
+                        dir = 0;
+                    m_Animator.SetInteger("AttackDirection", dir);
+                    break;
+            }
+            m_Animator.SetTrigger("NormalAttack");
+        }
+    }
+
+    public void CheckAttackState()
+    {
+        if (m_Animator.GetCurrentAnimatorStateInfo(1).IsName("Idle") && !m_Animator.GetBool("NormalAttack"))
+        {
+            if (m_OnAttackIdle != null)
+            {
+                m_OnAttackIdle();
+                m_OnAttackIdle = null;
+            }
+        }
+    }
+
+    // Command the player to equip a weapon
+    public void EquipWeapon(Weapon weap)
+    {
+        m_EquippedWeapon = weap;
+    }
+
+    public void DoDash()
+    {
+        bool dashLocked = !u_CanDash || m_WasGrappling || !m_Animator.GetCurrentAnimatorStateInfo(1).IsName("Idle");
+        bool dashAvailable = m_RemainingDashes > 0 && Time.time > m_DashRefreshedTime && !m_Animator.GetCurrentAnimatorStateInfo(0).IsName("Dash");
+        if (!dashLocked && dashAvailable)
+        {
+            m_Animator.SetTrigger("Dash");
+            m_RemainingDashes--;
+        }
+    }
+
+    public void DoGrapple(bool grappling)
+    {
+        bool grappleLocekd = !u_CanGrapple || m_WasDashing || !m_Animator.GetCurrentAnimatorStateInfo(1).IsName("Idle");
+        if (!grappleLocekd)
+        {
+            if (!m_WasGrappling && grappling)
+            {
+                Debug.Log("Trying grapple");
+                Collider2D[] grappleds = Physics2D.OverlapCircleAll(m_GrappleGun.transform.position, k_GrappleRadius, m_WhatIsGrappled.value);
+                if (grappleds.Length > 0)
+                {
+                    List<Collider2D> allGrapples = new List<Collider2D>(grappleds);
+                    allGrapples.Sort((a, b) => { return (int)(Vector2.Distance(a.transform.position, gameObject.transform.position) - Vector2.Distance(b.transform.position, gameObject.transform.position)); });
+                    foreach (Collider2D grappled in allGrapples) {
+                        if (grappled != null && grappled.TryGetComponent<GrappleHinge>(out GrappleHinge hinge))
+                        {
+                            Unwall();
+                            hinge.StartGrapple(this);
+                            m_WasGrappling = true;
+                            m_GrappleHinge = hinge;
+                            break;
+                        }
+                    }
+                }
+            } else if (m_WasGrappling && !grappling && m_GrappleHinge)
+            {
+                EndGrapple();
+            }
+        }
+    }
+
+    public void CheckGrappleEnd()
+    {
+        if (m_GrappleHinge)
+        {
+            if (!m_WasGrappling || Vector2.Distance(m_GrappleHinge.transform.position, gameObject.transform.position) > k_GrappleRadius)
+            {
+                EndGrapple();
+            } else
+            {
+                float grappleWeight = Math.Abs(2 * m_RigidBody2D.velocity.magnitude / m_GrappleMaxSpeed);
+                if (grappleWeight > 1)
+                {
+                    grappleWeight = 1f;
+                }
+                float zValue = (Utility.AngleInDeg(m_GrappleHinge.gameObject.transform.position, m_GrappleGun.gameObject.transform.position) + 90) * grappleWeight;
+                Quaternion target = Quaternion.Euler(0, 0, zValue);
+                m_TargetRotation = target;
+                gameObject.transform.rotation = target;
+            }
+        }
+    }
+
+    private void EndGrapple()
+    {
+        m_GrappleHinge.EndGrapple();
+        m_WasGrappling = false;
+        m_GrappleHinge = null;
+        m_TargetRotation = Quaternion.Euler(0, 0, 0);
+        RefreshMovement();
+    }
+
+    void CheckRotation()
+    {
+        transform.rotation = Quaternion.Lerp(transform.rotation, m_TargetRotation, m_RotationLerp);
+    }
+
+    public void Bounce()
+    {
+        m_ShouldBounce = true;
+    }
+
+    private void CheckWalled(int vertical)
+    {
+        bool wallLocked = !u_CanWallLatch || m_Grounded || !m_Animator.GetCurrentAnimatorStateInfo(1).IsName("Idle");
+        if (!wallLocked)
+        {
+            bool nowWalled = false;
+            if (Physics2D.OverlapCircle(m_RightWallCheck.position, k_WalledRadius, m_WhatIsGround))
+                nowWalled = true;
+
+            if (!nowWalled)
+            {
+                Unwall();
+                return;
+            }
+
+            if (!m_WasWalled)
+            {
+                if (m_WasDashing)
+                {
+                    EndDashing();
+                    m_WasDashing = false;
+                    m_Animator.SetTrigger("WalledDash");
+                }
+                if (m_WasGrappling)
+                {
+                    EndGrapple();
+                }
+
+                m_RigidBody2D.gravityScale = 0;
+                m_RigidBody2D.velocity = new Vector2(0, 0);
+                m_WasWalled = true;
+                m_Animator.SetBool("Walled", true);
+                RefreshMovement();
+            }
+            if (vertical < 0)
+            {
+                m_RigidBody2D.velocity = new Vector2(m_RigidBody2D.velocity.x, -m_WallSlideSpeed);
+            } else if (Time.time > m_JumpTime)
+            {
+                m_RigidBody2D.velocity = new Vector2(m_RigidBody2D.velocity.x, 0);
+            }
+        }
+    }
+
+    private void Unwall()
+    {
+        if (m_WasWalled)
+        {
+            m_WasWalled = false;
+            m_RigidBody2D.gravityScale = m_GravMod;
+            m_Animator.SetBool("Walled", false);
+        }
+    }
+    
 }

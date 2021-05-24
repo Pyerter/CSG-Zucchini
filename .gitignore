@@ -60,3 +60,6 @@ crashlytics-build.properties
 
 # Ignore Test Builds
 TestBuild/
+
+# Ignore Krita Backups
+*.kra~
