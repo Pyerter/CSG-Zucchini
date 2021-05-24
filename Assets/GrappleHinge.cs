@@ -25,10 +25,14 @@ public class GrappleHinge : MonoBehaviour
             m_CurrentJoint.connectedAnchor = gameObject.transform.position;
 
             // set the distance for the grapple
-            m_CurrentJoint.autoConfigureDistance = true;
+            m_CurrentJoint.autoConfigureDistance = false;
+            m_CurrentJoint.distance = Vector2.Distance(controller.gameObject.transform.position, gameObject.transform.position);
 
             // change joint key values
-            m_CurrentJoint.dampingRatio = 7f;
+            m_CurrentJoint.dampingRatio = 1f;
+            m_CurrentJoint.frequency = 1000000;
+
+            m_CurrentJoint.enableCollision = true;
 
             m_CurrentController = controller;
 
@@ -40,7 +44,7 @@ public class GrappleHinge : MonoBehaviour
     {
         if (m_CurrentJoint && m_CurrentController != null) {
             lr.SetPosition(0, m_CurrentController.m_GrappleGun.position);
-            lr.SetPosition(1, gameObject.transform.position);
+            lr.SetPosition(1, this.gameObject.transform.position);
         }
     }
 

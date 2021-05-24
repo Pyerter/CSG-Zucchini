@@ -6,8 +6,11 @@ using UnityEngine.Events;
 public class PlayerController : MonoBehaviour
 {
     // Speed variables
+    [SerializeField] private float m_RunSpeed = 10f;
     [SerializeField] private float m_JumpSpeed = 15f;
     [SerializeField] private float m_DashSpeed = 40f;
+    [SerializeField] private float m_GrappleMaxSpeed = 60f;
+    [SerializeField] private float m_GrappleSpeedAccelerate = 0.2f;
     [Range(0, 1)] [SerializeField] private float m_CrouchSpeed = 0.5f;
     [Range(0, 0.3f)] [SerializeField] private float m_MovementSmoothing = 0.05f;
     private float m_GravMod; // value stores the grav mod for the rigidbody
@@ -38,9 +41,13 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private GameObject m_Fists;
 
+    // Dynamic references
+    private GrappleHinge m_GrappleHinge;
+
     // Size variables
     const float k_GroundedRadius = 0.4f; // Grounded detection radius
     const float k_CeilingRadius = 0.3f; // Ceiling detection radius
+    const float k_GrappleRadius = 8f; // radius where the player can grapple within
 
     // State variables
     [HideInInspector] public bool m_Grounded; // Is grounded
@@ -82,7 +89,7 @@ public class PlayerController : MonoBehaviour
     // Variables pertaining to the ability to do stuff
     private bool u_CanDash = true;
     private bool u_CanWallLatch = false;
-    private bool u_CanGrapple = false;
+    private bool u_CanGrapple = true;
     // - - -
 
     // When this object awakes
@@ -176,9 +183,12 @@ public class PlayerController : MonoBehaviour
             RefreshMovement();
         }
 
+
         HorizontalMovement(move, crouch);
 
         VerticalMovement(jump);
+
+        CheckGrappleEnd();
 
     }
 
@@ -259,8 +269,24 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+        // Modify the x velocity based on grapple or not
+        float xVelocity = move;
+        if (!m_WasGrappling)
+        {
+            xVelocity = xVelocity * m_RunSpeed;
+        } else
+        {
+            xVelocity = xVelocity * m_GrappleSpeedAccelerate + m_RigidBody2D.velocity.x;
+            if (Math.Abs(xVelocity) > m_GrappleMaxSpeed)
+            {
+                if (xVelocity < 0)
+                    xVelocity = -m_GrappleMaxSpeed;
+                else
+                    xVelocity = m_GrappleMaxSpeed;
+            }
+        }
         // set the target horizontal velocity
-        Vector3 targetVelocity = new Vector2(move * 10f, m_RigidBody2D.velocity.y);
+        Vector3 targetVelocity = new Vector2(xVelocity, m_RigidBody2D.velocity.y);
         // smooth towards it
         m_RigidBody2D.velocity = Vector3.SmoothDamp(m_RigidBody2D.velocity, targetVelocity, ref m_Velocity, m_MovementSmoothing);
     }
@@ -272,7 +298,7 @@ public class PlayerController : MonoBehaviour
         Vector3 velocity = m_RigidBody2D.velocity;
 
         // Check if the player can input jumps or fast falls
-        bool jumpLocked = !m_WasDashing && !m_WasGrappling;
+        bool jumpLocked = m_WasDashing || m_WasGrappling;
         if (!jumpLocked)
         {
             // Check for valid jumps or fast falls
@@ -386,7 +412,56 @@ public class PlayerController : MonoBehaviour
 
     public void DoGrapple(bool grappling)
     {
+        bool grappleLocekd = m_WasDashing || !m_Animator.GetCurrentAnimatorStateInfo(1).IsName("Idle");
+        if (u_CanGrapple && !grappleLocekd)
+        {
+            if (!m_WasGrappling && grappling)
+            {
+                Debug.Log("Trying grapple");
+                Collider2D grappled = Physics2D.OverlapCircle(m_GrappleGun.transform.position, k_GrappleRadius, m_WhatIsGrappled.value);
+                if (grappled != null && grappled.TryGetComponent<GrappleHinge>(out GrappleHinge hinge))
+                {
+                    hinge.StartGrapple(this);
+                    m_WasGrappling = true;
+                    m_GrappleHinge = hinge;
+                } else if (grappled == null)
+                {
+                    Debug.Log("No Collider");
+                }
+            } else if (m_WasGrappling && !grappling && m_GrappleHinge)
+            {
+                EndGrapple();
+            }
+        }
+    }
 
+    public void CheckGrappleEnd()
+    {
+        if (m_GrappleHinge)
+        {
+            if (!m_WasGrappling || Vector2.Distance(m_GrappleHinge.transform.position, gameObject.transform.position) > k_GrappleRadius)
+            {
+                EndGrapple();
+            } else
+            {
+                float grappleWeight = Math.Abs(2 * m_RigidBody2D.velocity.magnitude / m_GrappleMaxSpeed);
+                if (grappleWeight > 1)
+                {
+                    grappleWeight = 1f;
+                }
+                float zValue = (Utility.AngleInDeg(m_GrappleHinge.gameObject.transform.position, m_GrappleGun.gameObject.transform.position) + 90) * grappleWeight;
+                Quaternion target = Quaternion.Euler(0, 0, zValue);
+                gameObject.transform.rotation = target;
+            }
+        }
+    }
+
+    private void EndGrapple()
+    {
+        m_GrappleHinge.EndGrapple();
+        m_WasGrappling = false;
+        m_GrappleHinge = null;
+        gameObject.transform.rotation = Quaternion.Euler(0, 0, 0);
     }
     
 }

@@ -5329,7 +5329,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_JumpSpeed: 15
   m_DashSpeed: 20
-  m_DashCooldown: 0.25
   m_CrouchSpeed: 0.36
   m_MovementSmoothing: 0.05
   m_AirControl: 1
@@ -5340,17 +5339,22 @@ MonoBehaviour:
     m_Bits: 64
   m_WhatIsPunched:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
+  m_WhatIsGrappled:
+    serializedVersion: 2
+    m_Bits: 512
   m_GroundCheck: {fileID: 8895950251414526178}
   m_CeilingCheck: {fileID: 8895950251244486191}
   m_RightWallCheck: {fileID: 8895950250916474185}
   m_LeftWallCheck: {fileID: 8895950250267484146}
+  m_GrappleGun: {fileID: 7501617910346426525}
   m_WalkingDust: {fileID: 4765644072084791304}
   m_Animator: {fileID: 0}
   m_Fists: {fileID: 5784608122525537171}
   m_Grounded: 0
   k_JumpStopDelay: 0.1
   k_GroundedDelay: 0.05
+  m_DashCooldown: 0.25
   onLandEvent:
     m_PersistentCalls:
       m_Calls: []

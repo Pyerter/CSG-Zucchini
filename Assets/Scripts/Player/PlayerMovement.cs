@@ -96,5 +96,7 @@ public class PlayerMovement : MonoBehaviour
             controller.DoDash();
             requestDash = false;
         }
+
+        controller.DoGrapple(requestingGrapple);
     }
 }
