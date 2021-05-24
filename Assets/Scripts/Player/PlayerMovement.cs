@@ -84,7 +84,7 @@ public class PlayerMovement : MonoBehaviour
     void FixedUpdate()
     {
         // pass in movement values (horizontalMove modified by fixedDeltaTime to properly calculate moveSpeed as moveSpeed per second)
-        controller.Move(horizontalMove * Time.fixedDeltaTime, requestJump, false);
+        controller.Move(horizontalMove * Time.fixedDeltaTime, verticalMove, requestJump, false);
 
         if (requestingNormalAttack)
         {

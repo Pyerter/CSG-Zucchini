@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -10,6 +11,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float m_JumpSpeed = 18f;
     [SerializeField] private float m_BounceSpeed = 14f;
     [SerializeField] private float m_DashSpeed = 40f;
+    [SerializeField] private float m_WallSlideSpeed = 5f;
     [SerializeField] private float m_GrappleMaxSpeed = 60f;
     [SerializeField] private float m_GrappleSpeedAccelerate = 0.2f;
     [Range(0, 1)] [SerializeField] private float m_CrouchSpeed = 0.5f;
@@ -49,6 +51,7 @@ public class PlayerController : MonoBehaviour
 
     // Size variables
     const float k_GroundedRadius = 0.4f; // Grounded detection radius
+    const float k_WalledRadius = 0.1f; // Radius to detect wall latching
     const float k_CeilingRadius = 0.3f; // Ceiling detection radius
     const float k_GrappleRadius = 8f; // radius where the player can grapple within
 
@@ -59,6 +62,7 @@ public class PlayerController : MonoBehaviour
     private bool m_WasCrouching = false; // was crouching
     private bool m_WasDashing = false; // if the player was dashing in the previous frame
     private bool m_WasGrappling = false; // if the player was grappling
+    private bool m_WasWalled = false; // if the player was wall latching
     private bool m_ShouldBounce = false; // if this is true, the player's y velocity will be bounced up
     public bool m_HasBounced = false; // if the controller already bounced and should not
 
@@ -93,7 +97,7 @@ public class PlayerController : MonoBehaviour
 
     // Variables pertaining to the ability to do stuff
     private bool u_CanDash = true;
-    private bool u_CanWallLatch = false;
+    private bool u_CanWallLatch = true;
     private bool u_CanGrapple = true;
     // - - -
 
@@ -154,6 +158,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+        m_Animator.SetBool("Grounded", m_Grounded);
         if (wasGrounded)
         {
             m_GroundedTime = Time.time + k_GroundedDelay;
@@ -172,8 +177,14 @@ public class PlayerController : MonoBehaviour
     }
 
     // This method acts as movement input for the player
-    public void Move(float move, bool jump, bool crouch)
+    public void Move(float move, float verticalMove, bool jump, bool crouch)
     {
+        if (verticalMove > 0)
+            verticalMove = 1;
+        else if (verticalMove < 0)
+            verticalMove = -1;
+        int vertMove = (int)verticalMove;
+
         // if the player does not want to crouch
         if (!crouch)
         {
@@ -191,7 +202,7 @@ public class PlayerController : MonoBehaviour
         }
 
 
-        HorizontalMovement(move, crouch);
+        HorizontalMovement(move, vertMove, crouch);
 
         VerticalMovement(jump);
 
@@ -199,7 +210,7 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    private void HorizontalMovement(float move, bool crouch)
+    private void HorizontalMovement(float move, int verticalMovement, bool crouch)
     {
         bool dashing = CheckDashing();
 
@@ -221,6 +232,10 @@ public class PlayerController : MonoBehaviour
         {
             Flip();
         }
+
+        CheckWalled(verticalMovement);
+
+        m_Animator.SetFloat("Speed", Math.Abs(m_RigidBody2D.velocity.x));
     }
 
     // returns if the player is currently dashing
@@ -230,6 +245,10 @@ public class PlayerController : MonoBehaviour
 
         if (dashing && !m_WasDashing)
         {
+            if (m_WasWalled)
+            {
+                Flip();
+            }
             float dirMod = 1;
             if (!m_FacingRight)
             {
@@ -241,13 +260,18 @@ public class PlayerController : MonoBehaviour
         }
         else if (!dashing && m_WasDashing)
         {
-            m_RigidBody2D.gravityScale = m_GravMod;
-            m_DashRefreshedTime = Time.time + m_DashCooldown;
+            EndDashing();
         }
 
         m_WasDashing = dashing;
 
         return dashing;
+    }
+
+    private void EndDashing()
+    {
+        m_RigidBody2D.gravityScale = m_GravMod;
+        m_DashRefreshedTime = Time.time + m_DashCooldown;
     }
 
     private void CheckRun(float move, bool crouch)
@@ -309,7 +333,8 @@ public class PlayerController : MonoBehaviour
         if (!jumpLocked)
         {
             // Check for valid jumps or fast falls
-            bool canJump = Time.time < m_GroundedTime && jump && m_RemainingJumps > 0 && !m_HoldingJumpInput;
+            bool canJump = (m_WasWalled || Time.time < m_GroundedTime || m_RemainingJumps > 0) && jump && !m_HoldingJumpInput;
+            bool willExtraJump = m_RemainingJumps > 0 && Time.time > m_GroundedTime && !m_WasWalled;
             bool canFastFall = velocity.y > 0 && Time.time > m_GroundedTime && !jump && m_HoldingJumpInput;
 
             // if the player is grounded, wants to jump, has remaining jump, and is not holding jump input from previous jump
@@ -320,12 +345,21 @@ public class PlayerController : MonoBehaviour
 
                 // set upwards velocity
                 velocity.y = m_JumpSpeed;
+                if (m_WasWalled)
+                {
+                    if (m_FacingRight)
+                        velocity.x = -m_DashSpeed;
+                    else
+                        velocity.x = m_DashSpeed;
+                }
                 m_RigidBody2D.velocity = velocity;
 
                 // reduce remaining jumps and set jumping true, player starts holding a new jump input
-                m_RemainingJumps--;
+                if (willExtraJump)
+                    m_RemainingJumps--;
                 m_HoldingJumpInput = true;
                 m_JumpTime = Time.time + k_JumpStopDelay;
+                m_Animator.SetBool("Jumping", true);
             }
             // if the player is going up, is not grounded, is not putting jump input, but was holding jump previously
             else if (canFastFall)
@@ -349,6 +383,11 @@ public class PlayerController : MonoBehaviour
         {
             // they stop holding the jump input
             m_HoldingJumpInput = false;
+        }
+
+        if (m_RigidBody2D.velocity.y < 0)
+        {
+            m_Animator.SetBool("Jumping", false);
         }
 
     }
@@ -379,7 +418,7 @@ public class PlayerController : MonoBehaviour
     // Command the player to attack
     public void Attack(int dir)
     {
-        bool attackLocked = m_WasGrappling || m_WasDashing || !m_Animator.GetCurrentAnimatorStateInfo(1).IsName("Idle");
+        bool attackLocked = m_WasWalled || m_WasGrappling || m_WasDashing || !m_Animator.GetCurrentAnimatorStateInfo(1).IsName("Idle");
         if (!attackLocked)
         {
             switch (m_EquippedWeapon)
@@ -439,15 +478,21 @@ public class PlayerController : MonoBehaviour
             if (!m_WasGrappling && grappling)
             {
                 Debug.Log("Trying grapple");
-                Collider2D grappled = Physics2D.OverlapCircle(m_GrappleGun.transform.position, k_GrappleRadius, m_WhatIsGrappled.value);
-                if (grappled != null && grappled.TryGetComponent<GrappleHinge>(out GrappleHinge hinge))
+                Collider2D[] grappleds = Physics2D.OverlapCircleAll(m_GrappleGun.transform.position, k_GrappleRadius, m_WhatIsGrappled.value);
+                if (grappleds.Length > 0)
                 {
-                    hinge.StartGrapple(this);
-                    m_WasGrappling = true;
-                    m_GrappleHinge = hinge;
-                } else if (grappled == null)
-                {
-                    Debug.Log("No Collider");
+                    List<Collider2D> allGrapples = new List<Collider2D>(grappleds);
+                    allGrapples.Sort((a, b) => { return (int)(Vector2.Distance(a.transform.position, gameObject.transform.position) - Vector2.Distance(b.transform.position, gameObject.transform.position)); });
+                    foreach (Collider2D grappled in allGrapples) {
+                        if (grappled != null && grappled.TryGetComponent<GrappleHinge>(out GrappleHinge hinge))
+                        {
+                            Unwall();
+                            hinge.StartGrapple(this);
+                            m_WasGrappling = true;
+                            m_GrappleHinge = hinge;
+                            break;
+                        }
+                    }
                 }
             } else if (m_WasGrappling && !grappling && m_GrappleHinge)
             {
@@ -495,6 +540,60 @@ public class PlayerController : MonoBehaviour
     public void Bounce()
     {
         m_ShouldBounce = true;
+    }
+
+    private void CheckWalled(int vertical)
+    {
+        bool wallLocked = !u_CanWallLatch || m_Grounded || !m_Animator.GetCurrentAnimatorStateInfo(1).IsName("Idle");
+        if (!wallLocked)
+        {
+            bool nowWalled = false;
+            if (Physics2D.OverlapCircle(m_RightWallCheck.position, k_WalledRadius, m_WhatIsGround))
+                nowWalled = true;
+
+            if (!nowWalled)
+            {
+                Unwall();
+                return;
+            }
+
+            if (!m_WasWalled)
+            {
+                if (m_WasDashing)
+                {
+                    EndDashing();
+                    m_WasDashing = false;
+                    m_Animator.SetTrigger("WalledDash");
+                }
+                if (m_WasGrappling)
+                {
+                    EndGrapple();
+                }
+
+                m_RigidBody2D.gravityScale = 0;
+                m_RigidBody2D.velocity = new Vector2(0, 0);
+                m_WasWalled = true;
+                m_Animator.SetBool("Walled", true);
+                RefreshMovement();
+            }
+            if (vertical < 0)
+            {
+                m_RigidBody2D.velocity = new Vector2(m_RigidBody2D.velocity.x, -m_WallSlideSpeed);
+            } else if (Time.time > m_JumpTime)
+            {
+                m_RigidBody2D.velocity = new Vector2(m_RigidBody2D.velocity.x, 0);
+            }
+        }
+    }
+
+    private void Unwall()
+    {
+        if (m_WasWalled)
+        {
+            m_WasWalled = false;
+            m_RigidBody2D.gravityScale = m_GravMod;
+            m_Animator.SetBool("Walled", false);
+        }
     }
     
 }
