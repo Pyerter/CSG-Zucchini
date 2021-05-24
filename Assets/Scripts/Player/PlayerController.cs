@@ -13,8 +13,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float m_GrappleSpeedAccelerate = 0.2f;
     [Range(0, 1)] [SerializeField] private float m_CrouchSpeed = 0.5f;
     [Range(0, 0.3f)] [SerializeField] private float m_MovementSmoothing = 0.05f;
+    [Range(0, 0.5f)] [SerializeField] private float m_RotationLerp = 0.1f;
     private float m_GravMod; // value stores the grav mod for the rigidbody
     private Vector3 m_Velocity = Vector3.zero; // The movement velocity
+    private Quaternion m_TargetRotation;
 
     // Air control and jumps
     [SerializeField] private bool m_AirControl = false;
@@ -116,6 +118,7 @@ public class PlayerController : MonoBehaviour
 
         // set default values
         m_EquippedWeapon = Weapon.Fist;
+        m_TargetRotation = transform.rotation;
     }
 
     // Update is called once per frame
@@ -123,6 +126,7 @@ public class PlayerController : MonoBehaviour
     {
         CheckGrounded();
         CheckAttackState();
+        CheckRotation();
     }
 
     private void CheckGrounded()
@@ -451,6 +455,7 @@ public class PlayerController : MonoBehaviour
                 }
                 float zValue = (Utility.AngleInDeg(m_GrappleHinge.gameObject.transform.position, m_GrappleGun.gameObject.transform.position) + 90) * grappleWeight;
                 Quaternion target = Quaternion.Euler(0, 0, zValue);
+                m_TargetRotation = target;
                 gameObject.transform.rotation = target;
             }
         }
@@ -461,7 +466,12 @@ public class PlayerController : MonoBehaviour
         m_GrappleHinge.EndGrapple();
         m_WasGrappling = false;
         m_GrappleHinge = null;
-        gameObject.transform.rotation = Quaternion.Euler(0, 0, 0);
+        m_TargetRotation = Quaternion.Euler(0, 0, 0);
+    }
+
+    void CheckRotation()
+    {
+        transform.rotation = Quaternion.Lerp(transform.rotation, m_TargetRotation, m_RotationLerp);
     }
     
 }
