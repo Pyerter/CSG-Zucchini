@@ -7,7 +7,8 @@ public class PlayerController : MonoBehaviour
 {
     // Speed variables
     [SerializeField] private float m_RunSpeed = 10f;
-    [SerializeField] private float m_JumpSpeed = 15f;
+    [SerializeField] private float m_JumpSpeed = 18f;
+    [SerializeField] private float m_BounceSpeed = 14f;
     [SerializeField] private float m_DashSpeed = 40f;
     [SerializeField] private float m_GrappleMaxSpeed = 60f;
     [SerializeField] private float m_GrappleSpeedAccelerate = 0.2f;
@@ -58,6 +59,8 @@ public class PlayerController : MonoBehaviour
     private bool m_WasCrouching = false; // was crouching
     private bool m_WasDashing = false; // if the player was dashing in the previous frame
     private bool m_WasGrappling = false; // if the player was grappling
+    private bool m_ShouldBounce = false; // if this is true, the player's y velocity will be bounced up
+    public bool m_HasBounced = false; // if the controller already bounced and should not
 
     // Timer variables
     private float m_JumpTime = 0f; // time the player jumped
@@ -302,7 +305,7 @@ public class PlayerController : MonoBehaviour
         Vector3 velocity = m_RigidBody2D.velocity;
 
         // Check if the player can input jumps or fast falls
-        bool jumpLocked = m_WasDashing || m_WasGrappling;
+        bool jumpLocked = m_WasDashing || m_WasGrappling || m_ShouldBounce;
         if (!jumpLocked)
         {
             // Check for valid jumps or fast falls
@@ -331,6 +334,14 @@ public class PlayerController : MonoBehaviour
                 velocity.y = 0f;
                 m_RigidBody2D.velocity = velocity;
             }
+        }
+
+        if (m_ShouldBounce && !m_HasBounced)
+        {
+            m_RigidBody2D.velocity = new Vector2(m_RigidBody2D.velocity.x, m_BounceSpeed);
+            m_ShouldBounce = false;
+            RefreshMovement();
+            m_HasBounced = true;
         }
 
         // check inputs, if player no longer wants to jump
@@ -368,7 +379,8 @@ public class PlayerController : MonoBehaviour
     // Command the player to attack
     public void Attack(int dir)
     {
-        if (m_Animator.GetCurrentAnimatorStateInfo(1).IsName("Idle"))
+        bool attackLocked = m_WasGrappling || m_WasDashing || !m_Animator.GetCurrentAnimatorStateInfo(1).IsName("Idle");
+        if (!attackLocked)
         {
             switch (m_EquippedWeapon)
             {
@@ -381,6 +393,9 @@ public class PlayerController : MonoBehaviour
                     }
                     m_Fists.SetActive(true);
                     m_Animator.SetInteger("AttackType", 0);
+                    if (m_Grounded && dir == -1)
+                        dir = 0;
+                    m_Animator.SetInteger("AttackDirection", dir);
                     break;
             }
             m_Animator.SetTrigger("NormalAttack");
@@ -407,7 +422,9 @@ public class PlayerController : MonoBehaviour
 
     public void DoDash()
     {
-        if (u_CanDash && m_RemainingDashes > 0 && Time.time > m_DashRefreshedTime && !m_Animator.GetCurrentAnimatorStateInfo(0).IsName("Dash"))
+        bool dashLocked = !u_CanDash || m_WasGrappling || !m_Animator.GetCurrentAnimatorStateInfo(1).IsName("Idle");
+        bool dashAvailable = m_RemainingDashes > 0 && Time.time > m_DashRefreshedTime && !m_Animator.GetCurrentAnimatorStateInfo(0).IsName("Dash");
+        if (!dashLocked && dashAvailable)
         {
             m_Animator.SetTrigger("Dash");
             m_RemainingDashes--;
@@ -416,8 +433,8 @@ public class PlayerController : MonoBehaviour
 
     public void DoGrapple(bool grappling)
     {
-        bool grappleLocekd = m_WasDashing || !m_Animator.GetCurrentAnimatorStateInfo(1).IsName("Idle");
-        if (u_CanGrapple && !grappleLocekd)
+        bool grappleLocekd = !u_CanGrapple || m_WasDashing || !m_Animator.GetCurrentAnimatorStateInfo(1).IsName("Idle");
+        if (!grappleLocekd)
         {
             if (!m_WasGrappling && grappling)
             {
@@ -467,11 +484,17 @@ public class PlayerController : MonoBehaviour
         m_WasGrappling = false;
         m_GrappleHinge = null;
         m_TargetRotation = Quaternion.Euler(0, 0, 0);
+        RefreshMovement();
     }
 
     void CheckRotation()
     {
         transform.rotation = Quaternion.Lerp(transform.rotation, m_TargetRotation, m_RotationLerp);
+    }
+
+    public void Bounce()
+    {
+        m_ShouldBounce = true;
     }
     
 }

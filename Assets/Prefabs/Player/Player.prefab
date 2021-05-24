@@ -5327,19 +5327,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3685b58f48077b94581c87d10c41e86d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_JumpSpeed: 15
+  m_RunSpeed: 10
+  m_JumpSpeed: 18
+  m_BounceSpeed: 14
   m_DashSpeed: 20
+  m_GrappleMaxSpeed: 20
+  m_GrappleSpeedAccelerate: 1.5
   m_CrouchSpeed: 0.36
   m_MovementSmoothing: 0.05
+  m_RotationLerp: 0.1
   m_AirControl: 1
   m_MaxJumps: 1
   m_MaxDashes: 1
   m_WhatIsGround:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 832
   m_WhatIsPunched:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 768
   m_WhatIsGrappled:
     serializedVersion: 2
     m_Bits: 512
@@ -5352,6 +5357,7 @@ MonoBehaviour:
   m_Animator: {fileID: 0}
   m_Fists: {fileID: 5784608122525537171}
   m_Grounded: 0
+  m_HasBounced: 0
   k_JumpStopDelay: 0.1
   k_GroundedDelay: 0.05
   m_DashCooldown: 0.25

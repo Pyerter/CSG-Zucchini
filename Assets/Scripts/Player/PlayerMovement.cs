@@ -12,6 +12,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float runSpeed = 2f;
 
     private float horizontalMove = 0f;
+    private float verticalMove = 0f;
 
     private bool requestJump = false;
 
@@ -28,8 +29,8 @@ public class PlayerMovement : MonoBehaviour
         controls.Player.Jump.started += _ => { Debug.Log("JUMP"); requestJump = true; };
         controls.Player.Jump.canceled += _ => { Debug.Log("NO JUMP"); requestJump = false; };
 
-        controls.Player.Motion.performed += ctxt => { horizontalMove = ctxt.ReadValue<Vector2>().x * runSpeed; };
-        controls.Player.Motion.canceled += ctxt => { horizontalMove = 0; };
+        controls.Player.Motion.performed += ctxt => { Vector2 vec = ctxt.ReadValue<Vector2>(); horizontalMove = vec.x * runSpeed; verticalMove = vec.y; };
+        controls.Player.Motion.canceled += ctxt => { horizontalMove = 0; verticalMove = 0; };
 
         controls.Player.Light.started += _ => { requestingNormalAttack = true; };
 
@@ -87,7 +88,15 @@ public class PlayerMovement : MonoBehaviour
 
         if (requestingNormalAttack)
         {
-            controller.Attack(0);
+            int dir = 0;
+            if (verticalMove > 0)
+            {
+                dir = 1;
+            } else if (verticalMove < 0)
+            {
+                dir = -1;
+            }
+            controller.Attack(dir);
             requestingNormalAttack = false;
         }
 

@@ -36,24 +36,32 @@ public class FistAttackTrigger : MonoBehaviour
         if (playerController.m_WhatIsPunched.value == (playerController.m_WhatIsPunched.value | (1 << collision.gameObject.layer)))
         {
             Debug.Log("Object is punchable");
-            Enemy enemy = collision.GetComponent<Enemy>();
-            if (enemy != null)
+            if (immuneTime.ContainsKey(collision.gameObject) && Time.time > immuneTime[collision.gameObject])
             {
-                if (immuneTime.ContainsKey(collision.gameObject) && Time.time > immuneTime[collision.gameObject])
-                {
-                    immuneTime.Remove(gameObject);
-                }
-                if (!immuneTime.ContainsKey(collision.gameObject))
-                {
-                    immuneTime.Add(collision.gameObject, m_ImmuneTimeOnHit);
-                    enemy.TakeDamage(m_Damage);
-                    Time.timeScale = m_FreezeTimeScale;
-                    m_ReleaseFreeze = Time.time + m_MaxFreezeTime;
-                    m_UpdateTime = Time.time;
-                    Debug.Log("Freeze Time");
-                }
+                immuneTime.Remove(gameObject);
+            }
+            if (!immuneTime.ContainsKey(collision.gameObject))
+            {
+                OnHit(collision);
+                if (playerController.GetComponent<Animator>().GetInteger("AttackDirection") == -1)
+                    playerController.Bounce();
+
             }
         }
+    }
+    private void OnHit(Collider2D collision)
+    {
+        Time.timeScale = m_FreezeTimeScale;
+        m_ReleaseFreeze = Time.time + m_MaxFreezeTime;
+        m_UpdateTime = Time.time;
+
+        Enemy enemy = collision.GetComponent<Enemy>();
+        if (enemy != null)
+        {
+            enemy.TakeDamage(m_Damage);
+            Debug.Log("Freeze Time");
+        }
+        immuneTime.Add(collision.gameObject, m_ImmuneTimeOnHit);
     }
 
     // Update is called once per frame
@@ -83,5 +91,6 @@ public class FistAttackTrigger : MonoBehaviour
         }
 
         immuneTime.Clear();
+        playerController.m_HasBounced = false;
     }
 }
