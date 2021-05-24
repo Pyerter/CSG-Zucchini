@@ -25,6 +25,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform m_LeftWallCheck;
     [SerializeField] private ParticleSystem m_WalkingDust;
     [SerializeField] private Animator m_Animator;
+    [SerializeField] public Transform m_GrappleGun;
     // Hit Box object references for attacks
     [SerializeField] private GameObject m_Fists;
 
