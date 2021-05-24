@@ -41,6 +41,14 @@ public class @InputMaster : IInputActionCollection, IDisposable
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""Dash"",
+                    ""type"": ""Button"",
+                    ""id"": ""44eb4e88-1384-4e10-bbea-4e25c81d72d6"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -208,6 +216,28 @@ public class @InputMaster : IInputActionCollection, IDisposable
                     ""action"": ""Motion"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""42ca73a3-d5e2-49ad-be1c-e8c3742be983"",
+                    ""path"": ""<Keyboard>/leftShift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""Dash"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""031ad255-076c-4772-9d7b-07447acdf2fa"",
+                    ""path"": ""<Gamepad>/leftTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Controller"",
+                    ""action"": ""Dash"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -241,6 +271,7 @@ public class @InputMaster : IInputActionCollection, IDisposable
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Light = m_Player.FindAction("Light", throwIfNotFound: true);
         m_Player_Motion = m_Player.FindAction("Motion", throwIfNotFound: true);
+        m_Player_Dash = m_Player.FindAction("Dash", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -293,6 +324,7 @@ public class @InputMaster : IInputActionCollection, IDisposable
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_Light;
     private readonly InputAction m_Player_Motion;
+    private readonly InputAction m_Player_Dash;
     public struct PlayerActions
     {
         private @InputMaster m_Wrapper;
@@ -300,6 +332,7 @@ public class @InputMaster : IInputActionCollection, IDisposable
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
         public InputAction @Light => m_Wrapper.m_Player_Light;
         public InputAction @Motion => m_Wrapper.m_Player_Motion;
+        public InputAction @Dash => m_Wrapper.m_Player_Dash;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -318,6 +351,9 @@ public class @InputMaster : IInputActionCollection, IDisposable
                 @Motion.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMotion;
                 @Motion.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMotion;
                 @Motion.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMotion;
+                @Dash.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnDash;
+                @Dash.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnDash;
+                @Dash.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnDash;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -331,6 +367,9 @@ public class @InputMaster : IInputActionCollection, IDisposable
                 @Motion.started += instance.OnMotion;
                 @Motion.performed += instance.OnMotion;
                 @Motion.canceled += instance.OnMotion;
+                @Dash.started += instance.OnDash;
+                @Dash.performed += instance.OnDash;
+                @Dash.canceled += instance.OnDash;
             }
         }
     }
@@ -358,5 +397,6 @@ public class @InputMaster : IInputActionCollection, IDisposable
         void OnJump(InputAction.CallbackContext context);
         void OnLight(InputAction.CallbackContext context);
         void OnMotion(InputAction.CallbackContext context);
+        void OnDash(InputAction.CallbackContext context);
     }
 }

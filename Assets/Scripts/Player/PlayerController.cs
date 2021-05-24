@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
 {
     // Speed variables
     [SerializeField] private float m_JumpSpeed = 15f;
+    [SerializeField] private float m_DashSpeed = 40f;
     [Range(0, 1)] [SerializeField] private float m_CrouchSpeed = 0.5f;
     [Range(0, 0.3f)] [SerializeField] private float m_MovementSmoothing = 0.05f;
     // Air control and jumps
@@ -62,6 +63,8 @@ public class PlayerController : MonoBehaviour
     private bool m_WasCrouching = false; // was crouching
     // Smaller events/delegates
     public Action m_OnAttackIdle; // end of attack event
+    private bool m_WasDashing = false; // if the player was dashing in the previous frame
+    private float m_GravMod;
 
     private void Start()
     {
@@ -71,6 +74,8 @@ public class PlayerController : MonoBehaviour
         }
 
         m_EquippedWeapon = Weapon.Fist;
+
+        m_GravMod = m_RigidBody2D.gravityScale;
     }
 
     // When this object awakes
@@ -155,8 +160,35 @@ public class PlayerController : MonoBehaviour
             m_RemainingJumps = m_MaxJumps;
         }
 
+        HorizontalMovement(move, crouch);
+
+        VerticalMovement(jump);
+
+    }
+
+    private void HorizontalMovement(float move, bool crouch)
+    {
+        bool dashing = m_Animator.GetCurrentAnimatorStateInfo(0).IsName("Dash");
+        
+        if (dashing && !m_WasDashing)
+        {
+            float dirMod = 1;
+            if (!m_FacingRight)
+            {
+                dirMod = -1;
+            }
+            m_RigidBody2D.velocity = new Vector2(m_DashSpeed * dirMod, 0f);
+            m_RigidBody2D.gravityScale = 0f;
+
+        } else if (!dashing && m_WasDashing)
+        {
+            m_RigidBody2D.gravityScale = m_GravMod;
+        }
+
+        m_WasDashing = dashing;
+
         // allow horizontal movement if grounded or player has air control
-        if (m_Grounded || m_AirControl)
+        if (!dashing && (m_Grounded || m_AirControl))
         {
 
             // if player is crouching
@@ -169,11 +201,9 @@ public class PlayerController : MonoBehaviour
                     m_WasCrouching = true;
                     OnCrouchEvent.Invoke(true);
                 }
-
                 // multiply speed by crouch speed modifier
                 move *= m_CrouchSpeed;
-
-            } 
+            }
             else
             {
                 // if the player was crouching
@@ -194,7 +224,7 @@ public class PlayerController : MonoBehaviour
             if (move > 0 && !m_FacingRight)
             {
                 Flip();
-            } 
+            }
             // if the player is moving left and facing right, flip
             else if (move < 0 && m_FacingRight)
             {
@@ -202,6 +232,10 @@ public class PlayerController : MonoBehaviour
             }
 
         }
+    }
+
+    private void VerticalMovement(bool jump)
+    {
 
         // grab the velocity vector
         Vector3 velocity = m_RigidBody2D.velocity;
@@ -293,6 +327,14 @@ public class PlayerController : MonoBehaviour
     public void EquipWeapon(Weapon weap)
     {
         m_EquippedWeapon = weap;
+    }
+
+    public void DoDash()
+    {
+        if (!m_Animator.GetCurrentAnimatorStateInfo(0).IsName("Dash"))
+        {
+            m_Animator.SetTrigger("Dash");
+        }
     }
     
 

@@ -17,6 +17,8 @@ public class PlayerMovement : MonoBehaviour
 
     private bool requestingNormalAttack = false;
 
+    private bool requestDash = false;
+
     private void Awake()
     {
         controls = new InputMaster();
@@ -28,6 +30,8 @@ public class PlayerMovement : MonoBehaviour
         controls.Player.Motion.canceled += ctxt => { horizontalMove = 0; };
 
         controls.Player.Light.started += _ => { requestingNormalAttack = true; };
+
+        controls.Player.Dash.started += _ => { requestDash = true; };
     }
 
     private void OnEnable()
@@ -80,6 +84,12 @@ public class PlayerMovement : MonoBehaviour
         {
             controller.Attack(0);
             requestingNormalAttack = false;
+        }
+
+        if (requestDash)
+        {
+            controller.DoDash();
+            requestDash = false;
         }
     }
 }
