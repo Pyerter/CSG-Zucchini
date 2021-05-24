@@ -19,6 +19,8 @@ public class PlayerMovement : MonoBehaviour
 
     private bool requestDash = false;
 
+    private bool requestingGrapple = false;
+
     private void Awake()
     {
         controls = new InputMaster();
@@ -32,6 +34,9 @@ public class PlayerMovement : MonoBehaviour
         controls.Player.Light.started += _ => { requestingNormalAttack = true; };
 
         controls.Player.Dash.started += _ => { requestDash = true; };
+
+        controls.Player.Grapple.started += _ => { requestingGrapple = true; };
+        controls.Player.Grapple.canceled += _ => { requestingGrapple = false; };
     }
 
     private void OnEnable()

@@ -8,43 +8,57 @@ public class PlayerController : MonoBehaviour
     // Speed variables
     [SerializeField] private float m_JumpSpeed = 15f;
     [SerializeField] private float m_DashSpeed = 40f;
-    [SerializeField] private float m_DashCooldown = 0.25f;
     [Range(0, 1)] [SerializeField] private float m_CrouchSpeed = 0.5f;
     [Range(0, 0.3f)] [SerializeField] private float m_MovementSmoothing = 0.05f;
+    private float m_GravMod; // value stores the grav mod for the rigidbody
+    private Vector3 m_Velocity = Vector3.zero; // The movement velocity
+
     // Air control and jumps
     [SerializeField] private bool m_AirControl = false;
     [SerializeField] int m_MaxJumps = 1;
     [SerializeField] int m_MaxDashes = 1;
+    private int m_RemainingJumps = 1; // Jumps remaining
+    private int m_RemainingDashes = 1; // Dashes remaining
+
     // Layers to collide with
     [SerializeField] private LayerMask m_WhatIsGround;
     [SerializeField] public LayerMask m_WhatIsPunched;
+    [SerializeField] private LayerMask m_WhatIsGrappled;
+
     // Component/Object references
     [SerializeField] private Transform m_GroundCheck;
     [SerializeField] private Transform m_CeilingCheck;
     [SerializeField] private Transform m_RightWallCheck;
     [SerializeField] private Transform m_LeftWallCheck;
+    [SerializeField] public Transform m_GrappleGun;
+
     [SerializeField] private ParticleSystem m_WalkingDust;
     [SerializeField] private Animator m_Animator;
-    [SerializeField] public Transform m_GrappleGun;
-    // Hit Box object references for attacks
-    [SerializeField] private GameObject m_Fists;
-
-
-    const float k_GroundedRadius = 0.4f; // Grounded detection radius
-    [HideInInspector] public bool m_Grounded; // Is grounded
-
-    private int m_RemainingJumps = 1; // Jumps remaining
-    private bool m_HoldingJumpInput = false; // If player is holding jump input
-    private float m_JumpTime = 0f; // time the player jumped
-    [SerializeField] private float k_JumpStopDelay = 0.1f; // time the player can stop inputting jump after jumping
-    private float m_GroundedTime = 0f;
-    [SerializeField] private float k_GroundedDelay = 0.05f; // 
-    private int m_RemainingDashes = 1; // Dashes remaining
-
-    const float k_CeilingRadius = 0.3f; // Ceiling detection radius
-
     private Rigidbody2D m_RigidBody2D; // The RigibBody2D to use for velocity
 
+    [SerializeField] private GameObject m_Fists;
+
+    // Size variables
+    const float k_GroundedRadius = 0.4f; // Grounded detection radius
+    const float k_CeilingRadius = 0.3f; // Ceiling detection radius
+
+    // State variables
+    [HideInInspector] public bool m_Grounded; // Is grounded
+    private bool m_HoldingJumpInput = false; // If player is holding jump input
+    private bool m_FacingRight = true; // Player is facing right
+    private bool m_WasCrouching = false; // was crouching
+    private bool m_WasDashing = false; // if the player was dashing in the previous frame
+    private bool m_WasGrappling = false; // if the player was grappling
+
+    // Timer variables
+    private float m_JumpTime = 0f; // time the player jumped
+    [SerializeField] private float k_JumpStopDelay = 0.1f; // time the player can stop inputting jump after jumping
+    private float m_GroundedTime = 0f; // time player is grounded until
+    [SerializeField] private float k_GroundedDelay = 0.05f; // delay to remain grounded after collider doesn't touch ground
+    private float m_DashRefreshedTime = 0f; // Time the player is able to dash after cooldown
+    [SerializeField] private float m_DashCooldown = 0.25f; // Time player must wait to dash again
+
+    // Variables conerning attack states
     public enum Weapon
     {
         Fist,
@@ -54,22 +68,16 @@ public class PlayerController : MonoBehaviour
     };
     private Weapon m_EquippedWeapon;
 
-    private bool m_FacingRight = true; // Player is facing right
-    private Vector3 m_Velocity = Vector3.zero; // The movement velocity
 
     // List of events
     [Header("Events")]
     [Space]
     public UnityEvent onLandEvent; // landing events
-    [System.Serializable]
-    public class BoolEvent : UnityEvent<bool> { }
+    [System.Serializable] public class BoolEvent : UnityEvent<bool> { } // class to store bool event
     public BoolEvent OnCrouchEvent; // Bool event for crouch
-    private bool m_WasCrouching = false; // was crouching
+
     // Smaller events/delegates
     public Action m_OnAttackIdle; // end of attack event
-    private bool m_WasDashing = false; // if the player was dashing in the previous frame
-    private float m_DashRefreshedTime = 0f;
-    private float m_GravMod;
 
     // Variables pertaining to the ability to do stuff
     private bool u_CanDash = true;
@@ -77,23 +85,17 @@ public class PlayerController : MonoBehaviour
     private bool u_CanGrapple = false;
     // - - -
 
-    private void Start()
-    {
-        if (m_Animator == null)
-        {
-            m_Animator = GetComponent<Animator>();
-        }
-
-        m_EquippedWeapon = Weapon.Fist;
-
-        m_GravMod = m_RigidBody2D.gravityScale;
-    }
-
     // When this object awakes
     private void Awake()
     {
         // find the RigidBody2D component
         m_RigidBody2D = GetComponent<Rigidbody2D>();
+        m_GravMod = m_RigidBody2D.gravityScale;
+        // make sure the animator is present
+        if (m_Animator == null)
+        {
+            m_Animator = GetComponent<Animator>();
+        }
 
         // set null events to non-null
         if (onLandEvent == null)
@@ -104,6 +106,9 @@ public class PlayerController : MonoBehaviour
         {
             OnCrouchEvent = new BoolEvent();
         }
+
+        // set default values
+        m_EquippedWeapon = Weapon.Fist;
     }
 
     // Update is called once per frame
@@ -179,8 +184,33 @@ public class PlayerController : MonoBehaviour
 
     private void HorizontalMovement(float move, bool crouch)
     {
+        bool dashing = CheckDashing();
+
+        bool canMoveSides = !dashing && (m_Grounded || m_AirControl);
+
+        if (canMoveSides)
+        {
+            CheckRun(move, crouch);
+        }
+
+        // Check flips
+        // if the player is moving right and not facing right, flip
+        if (move > 0 && !m_FacingRight)
+        {
+            Flip();
+        }
+        // if the player is moving left and facing right, flip
+        else if (move < 0 && m_FacingRight)
+        {
+            Flip();
+        }
+    }
+
+    // returns if the player is currently dashing
+    private bool CheckDashing()
+    {
         bool dashing = m_Animator.GetCurrentAnimatorStateInfo(0).IsName("Dash");
-        
+
         if (dashing && !m_WasDashing)
         {
             float dirMod = 1;
@@ -191,7 +221,8 @@ public class PlayerController : MonoBehaviour
             m_RigidBody2D.velocity = new Vector2(m_DashSpeed * dirMod, 0f);
             m_RigidBody2D.gravityScale = 0f;
 
-        } else if (!dashing && m_WasDashing)
+        }
+        else if (!dashing && m_WasDashing)
         {
             m_RigidBody2D.gravityScale = m_GravMod;
             m_DashRefreshedTime = Time.time + m_DashCooldown;
@@ -199,51 +230,39 @@ public class PlayerController : MonoBehaviour
 
         m_WasDashing = dashing;
 
-        // allow horizontal movement if grounded or player has air control
-        if (!dashing && (m_Grounded || m_AirControl))
+        return dashing;
+    }
+
+    private void CheckRun(float move, bool crouch)
+    {
+        // if player is crouching
+        if (crouch)
         {
-
-            // if player is crouching
-            if (crouch)
+            // if the player was not just crouching
+            if (!m_WasCrouching)
             {
-                // if the player was not just crouching
-                if (!m_WasCrouching)
-                {
-                    // invoke the crouch event
-                    m_WasCrouching = true;
-                    OnCrouchEvent.Invoke(true);
-                }
-                // multiply speed by crouch speed modifier
-                move *= m_CrouchSpeed;
+                // invoke the crouch event
+                m_WasCrouching = true;
+                OnCrouchEvent.Invoke(true);
             }
-            else
-            {
-                // if the player was crouching
-                if (m_WasCrouching)
-                {
-                    // set and invoke the uncrouch event
-                    m_WasCrouching = false;
-                    OnCrouchEvent.Invoke(false);
-                }
-            }
-
-            // set the target horizontal velocity
-            Vector3 targetVelocity = new Vector2(move * 10f, m_RigidBody2D.velocity.y);
-            // smooth towards it
-            m_RigidBody2D.velocity = Vector3.SmoothDamp(m_RigidBody2D.velocity, targetVelocity, ref m_Velocity, m_MovementSmoothing);
-
-            // if the player is moving right and not facing right, flip
-            if (move > 0 && !m_FacingRight)
-            {
-                Flip();
-            }
-            // if the player is moving left and facing right, flip
-            else if (move < 0 && m_FacingRight)
-            {
-                Flip();
-            }
-
+            // multiply speed by crouch speed modifier
+            move *= m_CrouchSpeed;
         }
+        else
+        {
+            // if the player was crouching
+            if (m_WasCrouching)
+            {
+                // set and invoke the uncrouch event
+                m_WasCrouching = false;
+                OnCrouchEvent.Invoke(false);
+            }
+        }
+
+        // set the target horizontal velocity
+        Vector3 targetVelocity = new Vector2(move * 10f, m_RigidBody2D.velocity.y);
+        // smooth towards it
+        m_RigidBody2D.velocity = Vector3.SmoothDamp(m_RigidBody2D.velocity, targetVelocity, ref m_Velocity, m_MovementSmoothing);
     }
 
     private void VerticalMovement(bool jump)
@@ -252,30 +271,39 @@ public class PlayerController : MonoBehaviour
         // grab the velocity vector
         Vector3 velocity = m_RigidBody2D.velocity;
 
-        // if the player is grounded, wants to jump, has remaining jump, and is not holding jump input from previous jump
-        if (Time.time < m_GroundedTime && jump && m_RemainingJumps > 0 && !m_HoldingJumpInput)
+        // Check if the player can input jumps or fast falls
+        bool jumpLocked = !m_WasDashing && !m_WasGrappling;
+        if (!jumpLocked)
         {
-            // set grounded to false, as player is jumping
-            m_Grounded = false;
+            // Check for valid jumps or fast falls
+            bool canJump = Time.time < m_GroundedTime && jump && m_RemainingJumps > 0 && !m_HoldingJumpInput;
+            bool canFastFall = velocity.y > 0 && Time.time > m_GroundedTime && !jump && m_HoldingJumpInput;
 
-            // set upwards velocity
-            velocity.y = m_JumpSpeed;
-            m_RigidBody2D.velocity = velocity;
+            // if the player is grounded, wants to jump, has remaining jump, and is not holding jump input from previous jump
+            if (canJump)
+            {
+                // set grounded to false, as player is jumping
+                m_Grounded = false;
 
-            // reduce remaining jumps and set jumping true, player starts holding a new jump input
-            m_RemainingJumps--;
-            m_HoldingJumpInput = true;
-            m_JumpTime = Time.time + k_JumpStopDelay;
+                // set upwards velocity
+                velocity.y = m_JumpSpeed;
+                m_RigidBody2D.velocity = velocity;
+
+                // reduce remaining jumps and set jumping true, player starts holding a new jump input
+                m_RemainingJumps--;
+                m_HoldingJumpInput = true;
+                m_JumpTime = Time.time + k_JumpStopDelay;
+            }
+            // if the player is going up, is not grounded, is not putting jump input, but was holding jump previously
+            else if (canFastFall)
+            {
+                // set upwards velocity to 0
+                velocity.y = 0f;
+                m_RigidBody2D.velocity = velocity;
+            }
         }
-        // if the player is going up, is not grounded, is not putting jump input, but was holding jump previously
-        else if (velocity.y > 0 && Time.time > m_GroundedTime && !jump && m_HoldingJumpInput)
-        {
-            // set upwards velocity to 0
-            velocity.y = 0f;
-            m_RigidBody2D.velocity = velocity;
-        }
 
-        // if player no longer wants to jump
+        // check inputs, if player no longer wants to jump
         if (!jump && Time.time > m_JumpTime)
         {
             // they stop holding the jump input
@@ -354,6 +382,11 @@ public class PlayerController : MonoBehaviour
             m_Animator.SetTrigger("Dash");
             m_RemainingDashes--;
         }
+    }
+
+    public void DoGrapple(bool grappling)
+    {
+
     }
     
 }

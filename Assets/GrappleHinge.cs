@@ -38,13 +38,13 @@ public class GrappleHinge : MonoBehaviour
 
     public void DrawGrapple()
     {
-        if (m_CurrentController != null) {
+        if (m_CurrentJoint && m_CurrentController != null) {
             lr.SetPosition(0, m_CurrentController.m_GrappleGun.position);
             lr.SetPosition(1, gameObject.transform.position);
         }
     }
 
-    public void EndGrapple(PlayerController controller)
+    public void EndGrapple()
     {
         if (m_CurrentJoint)
         {
