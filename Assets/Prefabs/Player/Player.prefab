@@ -4891,6 +4891,7 @@ GameObject:
   - component: {fileID: 8489830540638292891}
   - component: {fileID: 3682642131937182762}
   - component: {fileID: 1999502686533297568}
+  - component: {fileID: 5151496258577107843}
   m_Layer: 7
   m_Name: Fist1
   m_TagString: Untagged
@@ -4991,6 +4992,24 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &5151496258577107843
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2399017169934473360}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6a305124ac5f49499668f24358872e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerController: {fileID: 8895950251571058779}
+  m_Damage: 5
+  m_IsHeavyAttack: 0
+  m_HeavyMultiplier: 2
+  m_MaxFreezeTime: 0.2
+  m_FreezeTimeScale: 0
 --- !u!1 &5784608122525537171
 GameObject:
   m_ObjectHideFlags: 0
@@ -5282,6 +5301,7 @@ MonoBehaviour:
   m_MovementSmoothing: 0.05
   m_AirControl: 1
   m_MaxJumps: 1
+  m_MaxDashes: 1
   m_WhatIsGround:
     serializedVersion: 2
     m_Bits: 64

@@ -8,11 +8,13 @@ public class PlayerController : MonoBehaviour
     // Speed variables
     [SerializeField] private float m_JumpSpeed = 15f;
     [SerializeField] private float m_DashSpeed = 40f;
+    [SerializeField] private float m_DashCooldown = 0.25f;
     [Range(0, 1)] [SerializeField] private float m_CrouchSpeed = 0.5f;
     [Range(0, 0.3f)] [SerializeField] private float m_MovementSmoothing = 0.05f;
     // Air control and jumps
     [SerializeField] private bool m_AirControl = false;
     [SerializeField] int m_MaxJumps = 1;
+    [SerializeField] int m_MaxDashes = 1;
     // Layers to collide with
     [SerializeField] private LayerMask m_WhatIsGround;
     [SerializeField] public LayerMask m_WhatIsPunched;
@@ -36,6 +38,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float k_JumpStopDelay = 0.1f; // time the player can stop inputting jump after jumping
     private float m_GroundedTime = 0f;
     [SerializeField] private float k_GroundedDelay = 0.05f; // 
+    private int m_RemainingDashes = 1; // Dashes remaining
 
     const float k_CeilingRadius = 0.3f; // Ceiling detection radius
 
@@ -64,7 +67,14 @@ public class PlayerController : MonoBehaviour
     // Smaller events/delegates
     public Action m_OnAttackIdle; // end of attack event
     private bool m_WasDashing = false; // if the player was dashing in the previous frame
+    private float m_DashRefreshedTime = 0f;
     private float m_GravMod;
+
+    // Variables pertaining to the ability to do stuff
+    private bool u_CanDash = true;
+    private bool u_CanWallLatch = false;
+    private bool u_CanGrapple = false;
+    // - - -
 
     private void Start()
     {
@@ -157,7 +167,7 @@ public class PlayerController : MonoBehaviour
         // if player is grounded, reset their remaining jumps
         if (m_Grounded)
         {
-            m_RemainingJumps = m_MaxJumps;
+            RefreshMovement();
         }
 
         HorizontalMovement(move, crouch);
@@ -183,6 +193,7 @@ public class PlayerController : MonoBehaviour
         } else if (!dashing && m_WasDashing)
         {
             m_RigidBody2D.gravityScale = m_GravMod;
+            m_DashRefreshedTime = Time.time + m_DashCooldown;
         }
 
         m_WasDashing = dashing;
@@ -272,6 +283,12 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    private void RefreshMovement()
+    {
+        m_RemainingJumps = m_MaxJumps;
+        m_RemainingDashes = m_MaxDashes;
+    }
+
     // Flip the player
     private void Flip()
     {
@@ -331,11 +348,11 @@ public class PlayerController : MonoBehaviour
 
     public void DoDash()
     {
-        if (!m_Animator.GetCurrentAnimatorStateInfo(0).IsName("Dash"))
+        if (u_CanDash && m_RemainingDashes > 0 && Time.time > m_DashRefreshedTime && !m_Animator.GetCurrentAnimatorStateInfo(0).IsName("Dash"))
         {
             m_Animator.SetTrigger("Dash");
+            m_RemainingDashes--;
         }
     }
     
-
 }

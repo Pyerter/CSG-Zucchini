@@ -184,28 +184,6 @@ LightingSettings:
   m_PVRFilteringAtrousPositionSigmaDirect: 0.5
   m_PVRFilteringAtrousPositionSigmaIndirect: 2
   m_PVRFilteringAtrousPositionSigmaAO: 1
---- !u!1 &144865561 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2399017169934473360, guid: 0b22c11a0aa765e4ca4be14643d9219a,
-    type: 3}
-  m_PrefabInstance: {fileID: 8895950249484599575}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &144865565
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 144865561}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b6a305124ac5f49499668f24358872e7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerController: {fileID: 931782622}
-  m_Damage: 5
-  m_IsHeavyAttack: 0
-  m_HeavyMultiplier: 2
 --- !u!1 &171209101
 GameObject:
   m_ObjectHideFlags: 0
@@ -713,18 +691,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &931782622 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8895950251571058779, guid: 0b22c11a0aa765e4ca4be14643d9219a,
-    type: 3}
-  m_PrefabInstance: {fileID: 8895950249484599575}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3685b58f48077b94581c87d10c41e86d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!198 &1009713226 stripped
 ParticleSystem:
   m_CorrespondingSourceObject: {fileID: 4765644072084791304, guid: 0b22c11a0aa765e4ca4be14643d9219a,
@@ -9957,7 +9923,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3e38a1412b956e4a89adcfca830625b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_MaxHealth: 10
+  m_MaxHealth: 100
 --- !u!61 &1194566440
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -10785,6 +10751,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5151496258577107843, guid: 0b22c11a0aa765e4ca4be14643d9219a,
+        type: 3}
+      propertyPath: m_MaxFreezeFrames
+      value: 30
+      objectReference: {fileID: 0}
     - target: {fileID: 5784608122525537171, guid: 0b22c11a0aa765e4ca4be14643d9219a,
         type: 3}
       propertyPath: m_IsActive
