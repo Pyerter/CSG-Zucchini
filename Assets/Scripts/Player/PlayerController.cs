@@ -129,11 +129,9 @@ public class PlayerController : MonoBehaviour
             if (m_Grounded && !m_WalkingDust.isPlaying)
             {
                 m_WalkingDust.Play();
-                Debug.Log("Playing");
             } else if (!m_Grounded && m_WalkingDust.isPlaying)
             {
                 m_WalkingDust.Stop();
-                Debug.Log("Stopping");
             }
         }
     }
