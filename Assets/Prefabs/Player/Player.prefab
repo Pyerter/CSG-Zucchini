@@ -5331,17 +5331,19 @@ MonoBehaviour:
   m_JumpSpeed: 18
   m_BounceSpeed: 14
   m_DashSpeed: 20
+  m_WallSlideSpeed: 5
   m_GrappleMaxSpeed: 20
   m_GrappleSpeedAccelerate: 1.5
   m_CrouchSpeed: 0.36
   m_MovementSmoothing: 0.05
+  m_LossMovementSmoothing: 0.3
   m_RotationLerp: 0.1
   m_AirControl: 1
   m_MaxJumps: 1
   m_MaxDashes: 1
   m_WhatIsGround:
     serializedVersion: 2
-    m_Bits: 832
+    m_Bits: 64
   m_WhatIsPunched:
     serializedVersion: 2
     m_Bits: 768
