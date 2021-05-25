@@ -48,12 +48,16 @@ public class PlayerController : MonoBehaviour
 
     // Dynamic references
     private GrappleHinge m_GrappleHinge;
+    private Enemy m_SlashTarget;
+    private Vector2 m_SlashDirection;
 
     // Size variables
     const float k_GroundedRadius = 0.4f; // Grounded detection radius
     const float k_WalledRadius = 0.1f; // Radius to detect wall latching
     const float k_CeilingRadius = 0.3f; // Ceiling detection radius
     const float k_GrappleRadius = 8f; // radius where the player can grapple within
+    const float k_SlashRadius = 5f; // radius where the player can dashslash
+    const float k_SlashSpacingDistance = 2f; // distance the player is opposite of slash origin, away from the target
 
     // State variables
     [HideInInspector] public bool m_Grounded; // Is grounded
@@ -65,6 +69,7 @@ public class PlayerController : MonoBehaviour
     private bool m_WasWalled = false; // if the player was wall latching
     private bool m_ShouldBounce = false; // if this is true, the player's y velocity will be bounced up
     public bool m_HasBounced = false; // if the controller already bounced and should not
+    private bool m_WasSlashing = false; // if the player is slashing through an enemy
 
     // Timer variables
     private float m_JumpTime = 0f; // time the player jumped
@@ -99,6 +104,7 @@ public class PlayerController : MonoBehaviour
     private bool u_CanDash = true;
     private bool u_CanWallLatch = true;
     private bool u_CanGrapple = true;
+    private bool u_CanSlash = true;
     // - - -
 
     // When this object awakes
@@ -594,6 +600,83 @@ public class PlayerController : MonoBehaviour
             m_RigidBody2D.gravityScale = m_GravMod;
             m_Animator.SetBool("Walled", false);
         }
+    }
+
+    public void DoSlash()
+    {
+        bool slashLocked = !u_CanSlash || m_WasDashing || !m_Animator.GetCurrentAnimatorStateInfo(1).IsName("Idle");
+
+        if (m_WasSlashing || slashLocked)
+            return;
+
+        Collider2D[] collisions = Physics2D.OverlapCircleAll(gameObject.transform.position, k_SlashRadius, m_WhatIsPunched);
+        if (collisions.Length <= 0)
+            return;
+
+        List<Collider2D> collisionsList = new List<Collider2D>(collisions);
+        collisionsList.Sort((a, b) => { return (int)(Vector2.Distance(a.transform.position, gameObject.transform.position) - Vector2.Distance(b.transform.position, gameObject.transform.position)); });
+        foreach (Collider2D slashes in collisionsList)
+        {
+            if (slashes != null && slashes.TryGetComponent<Enemy>(out Enemy enemy))
+            {
+                Vector2 distanceTo = slashes.gameObject.transform.position - gameObject.transform.position;
+                distanceTo.Normalize();
+                Vector2 bounds = enemy.GetComponent<Collider2D>().bounds.extents;
+                float hitBoxSize = bounds.magnitude;
+                bounds = GetComponent<Collider2D>().bounds.extents;
+                float hurtBoxSize = bounds.magnitude;
+                m_SlashDirection = distanceTo * (hitBoxSize + hurtBoxSize + k_SlashSpacingDistance);
+
+                RaycastHit2D[] obstructions = new RaycastHit2D[5];
+                slashes.Raycast(m_SlashDirection * 2f, obstructions);
+
+                bool hits = false;
+                foreach (RaycastHit2D ray in obstructions)
+                {
+                    bool isObstruction = m_WhatIsGround.value == (m_WhatIsGround.value | (1 << ray.collider.gameObject.layer));
+                    if (isObstruction)
+                    {
+                        hits = true;
+                        break;
+                    }
+                }
+
+                if (!hits)
+                {
+                    TryStartSlash();
+                    break;
+                }
+
+            }
+        }
+    }
+
+    private void CheckSlash()
+    {
+        bool starting = m_Animator.GetCurrentAnimatorStateInfo(0).IsName("SlashStartUp");
+        bool ending = m_Animator.GetCurrentAnimatorStateInfo(0).IsName("Slashing");
+        bool slashing = starting || ending;
+        if (slashing)
+        {
+            
+        }
+    }
+
+    private void TryStartSlash()
+    {
+        if (m_WasWalled)
+            Unwall();
+
+        m_Animator.SetTrigger("Slash");
+        m_WasSlashing = true;
+        m_RigidBody2D.gravityScale = 0;
+        m_RigidBody2D.velocity = new Vector2(0, 0);
+    }
+
+    private void EndSlash()
+    {
+        m_WasSlashing = false;
+        m_RigidBody2D.gravityScale = m_GravMod;
     }
     
 }
