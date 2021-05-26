@@ -92,6 +92,8 @@ public class PlayerController : MonoBehaviour
     };
     private Weapon m_EquippedWeapon;
 
+    private float m_SlashDamage = 10f;
+
 
     // List of events
     [Header("Events")]
@@ -735,6 +737,7 @@ public class PlayerController : MonoBehaviour
             Flip();
         }
         m_MovementSmoothing = m_LossMovementSmoothing;
+        m_SlashTarget.TakeDamage(m_SlashDamage);
         m_EndingSlash = true;
     }
 
@@ -742,6 +745,8 @@ public class PlayerController : MonoBehaviour
     {
         m_MovementSmoothing = m_InitialMovementSmooth;
         m_EndingSlash = false;
+        m_SlashTarget = null;
+        m_SlashDirection = Vector3.zero;
         RefreshMovement();
     }
     

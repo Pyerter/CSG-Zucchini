@@ -4892,7 +4892,7 @@ GameObject:
   - component: {fileID: 3682642131937182762}
   - component: {fileID: 1999502686533297568}
   - component: {fileID: 5151496258577107843}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: Fist1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
