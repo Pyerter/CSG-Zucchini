@@ -32,6 +32,7 @@ Transform:
   - {fileID: 8895950250916474185}
   - {fileID: 8895950250267484146}
   - {fileID: 1643671591805156252}
+  - {fileID: 7482708660085673848}
   m_Father: {fileID: 8895950251571058778}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5072,6 +5073,67 @@ Transform:
   m_Father: {fileID: 9040427330191745911}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8832820934332866705
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7482708660085673848}
+  - component: {fileID: 4843292821144840759}
+  - component: {fileID: 3123773300173904856}
+  m_Layer: 0
+  m_Name: HurtBox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7482708660085673848
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8832820934332866705}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 9040427330191745911}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!70 &4843292821144840759
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8832820934332866705}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_Size: {x: 0.99, y: 1.99}
+  m_Direction: 0
+--- !u!114 &3123773300173904856
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8832820934332866705}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43c7b5f307902fc4c946374690c35f17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Controller: {fileID: 8895950251571058779}
 --- !u!1 &8895950249598944615
 GameObject:
   m_ObjectHideFlags: 0
@@ -5363,6 +5425,9 @@ MonoBehaviour:
   k_JumpStopDelay: 0.1
   k_GroundedDelay: 0.05
   m_DashCooldown: 0.25
+  m_InvulnerableTime: 1.5
+  m_InvulnerableMovementLossTime: 0.2
+  m_GrappleMovementLossTime: 0.25
   onLandEvent:
     m_PersistentCalls:
       m_Calls: []

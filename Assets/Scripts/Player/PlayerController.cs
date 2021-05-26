@@ -6,6 +6,9 @@ using UnityEngine.Events;
 // This class is adapted and based off of Brackeys' CharacterController: https://github.com/Brackeys/2D-Character-Controller/blob/master/CharacterController2D.cs
 public class PlayerController : MonoBehaviour
 {
+    // Stat variables
+    private float m_Health = 100f;
+
     // Speed variables
     [SerializeField] private float m_RunSpeed = 10f;
     [SerializeField] private float m_JumpSpeed = 18f;
@@ -52,6 +55,7 @@ public class PlayerController : MonoBehaviour
     private GrappleHinge m_GrappleHinge;
     private Enemy m_SlashTarget;
     private Vector3 m_SlashDirection;
+    private Transform m_Bouncer;
 
     // Size variables
     const float k_GroundedRadius = 0.4f; // Grounded detection radius
@@ -81,6 +85,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float k_GroundedDelay = 0.05f; // delay to remain grounded after collider doesn't touch ground
     private float m_DashRefreshedTime = 0f; // Time the player is able to dash after cooldown
     [SerializeField] private float m_DashCooldown = 0.25f; // Time player must wait to dash again
+    private float m_VulnerableAfter = 0f; // time that player is vulnerable again
+    [SerializeField] private float m_InvulnerableTime = 1.5f; // time player is invulnerable after damage
+    [SerializeField] private float m_InvulnerableMovementLossTime = 0.5f;
+    [SerializeField] private float m_GrappleMovementLossTime = 0.25f; // the time where player loses some movement control after grappling
+    private float m_RegainMovementTime = 0f; // the time, where afterwards, the player regains more movement control
 
     // Variables conerning attack states
     public enum Weapon
@@ -226,6 +235,11 @@ public class PlayerController : MonoBehaviour
 
     private void HorizontalMovement(float move, int verticalMovement, bool crouch)
     {
+        if (m_MovementSmoothing == m_LossMovementSmoothing && Time.time > m_RegainMovementTime)
+            m_MovementSmoothing = m_InitialMovementSmooth;
+        else if (m_MovementSmoothing == m_InitialMovementSmooth && Time.time < m_RegainMovementTime)
+            m_MovementSmoothing = m_LossMovementSmoothing;
+
         bool dashing = CheckDashing();
 
         bool canMoveSides = !dashing && (m_Grounded || m_AirControl);
@@ -389,10 +403,23 @@ public class PlayerController : MonoBehaviour
 
         if (m_ShouldBounce && !m_HasBounced)
         {
-            m_RigidBody2D.velocity = new Vector2(m_RigidBody2D.velocity.x, m_BounceSpeed);
             m_ShouldBounce = false;
+            if (m_Bouncer != null)
+            {
+                Vector3 newVelocity = transform.position - m_Bouncer.position;
+                newVelocity.z = 0;
+                newVelocity.Normalize();
+                newVelocity *= m_BounceSpeed;
+                m_RigidBody2D.velocity = newVelocity;
+                m_HasBounced = false;
+                m_Bouncer = null;
+            }
+            else
+            {
+                m_RigidBody2D.velocity = new Vector2(m_RigidBody2D.velocity.x, m_BounceSpeed);
+                m_HasBounced = true;
+            }
             RefreshMovement();
-            m_HasBounced = true;
         }
 
         // check inputs, if player no longer wants to jump
@@ -542,6 +569,7 @@ public class PlayerController : MonoBehaviour
 
     private void EndGrapple()
     {
+        m_RegainMovementTime = Time.time + m_GrappleMovementLossTime;
         m_GrappleHinge.EndGrapple();
         m_WasGrappling = false;
         m_GrappleHinge = null;
@@ -585,6 +613,10 @@ public class PlayerController : MonoBehaviour
                 if (m_WasGrappling)
                 {
                     EndGrapple();
+                }
+                if (m_EndingSlash)
+                {
+                    FinishSlash();
                 }
 
                 m_RigidBody2D.gravityScale = 0;
@@ -703,6 +735,8 @@ public class PlayerController : MonoBehaviour
         bool starting = m_Animator.GetCurrentAnimatorStateInfo(0).IsName("SlashStartUp");
         bool ending = m_Animator.GetCurrentAnimatorStateInfo(0).IsName("Slashing");
         bool slashing = starting || ending;
+        if (m_EndingSlash)
+            m_RegainMovementTime = Time.time + Time.fixedDeltaTime * 5;
         if (ending && !m_EndingSlash)
         {
             EndSlash();
@@ -736,18 +770,33 @@ public class PlayerController : MonoBehaviour
         {
             Flip();
         }
-        m_MovementSmoothing = m_LossMovementSmoothing;
         m_SlashTarget.TakeDamage(m_SlashDamage);
         m_EndingSlash = true;
     }
 
     private void FinishSlash()
     {
-        m_MovementSmoothing = m_InitialMovementSmooth;
+        m_RegainMovementTime = 0f;
         m_EndingSlash = false;
         m_SlashTarget = null;
         m_SlashDirection = Vector3.zero;
         RefreshMovement();
     }
-    
+
+    public void TakeDamage(float damage, Transform bouncer)
+    {
+        if (Time.time < m_VulnerableAfter)
+            return;
+
+        m_VulnerableAfter = Time.time + m_InvulnerableTime;
+        m_RegainMovementTime = Time.time + (m_InvulnerableMovementLossTime);
+        m_ShouldBounce = true;
+        m_Bouncer = bouncer;
+        m_Health -= damage;
+        if (m_Health < 0)
+            Debug.Log("You died");
+        else
+            Debug.Log("Off. " + damage + " damage. ");
+    }
+
 }
