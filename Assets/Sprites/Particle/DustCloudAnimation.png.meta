@@ -1,0 +1,579 @@
+fileFormatVersion: 2
+guid: 9e10b8b9ed3f93545816da5c83428e3d
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 143027063152396020
+    second: DustCloudAnimation_0
+  - first:
+      213: 2441991161466606003
+    second: DustCloudAnimation_1
+  - first:
+      213: 1323671609290787473
+    second: DustCloudAnimation_2
+  - first:
+      213: 6019821287557392297
+    second: DustCloudAnimation_3
+  - first:
+      213: -4742641032152757573
+    second: DustCloudAnimation_4
+  - first:
+      213: 591863464395286697
+    second: DustCloudAnimation_5
+  - first:
+      213: 6202614769959153576
+    second: DustCloudAnimation_6
+  - first:
+      213: 1287475202278553810
+    second: DustCloudAnimation_7
+  - first:
+      213: 7887539638406948080
+    second: DustCloudAnimation_8
+  - first:
+      213: -5574884672560918682
+    second: DustCloudAnimation_9
+  - first:
+      213: -2650384635767502439
+    second: DustCloudAnimation_10
+  - first:
+      213: 5232822353775736428
+    second: DustCloudAnimation_11
+  - first:
+      213: -7723174258373726478
+    second: DustCloudAnimation_12
+  - first:
+      213: -62759058260259654
+    second: DustCloudAnimation_13
+  - first:
+      213: 5101545891331720886
+    second: DustCloudAnimation_14
+  - first:
+      213: 6005635692012795306
+    second: DustCloudAnimation_15
+  - first:
+      213: -3118894687042743768
+    second: DustCloudAnimation_16
+  - first:
+      213: 6826857999910563711
+    second: DustCloudAnimation_17
+  - first:
+      213: 4179309401287678868
+    second: DustCloudAnimation_18
+  - first:
+      213: 1199479482032876950
+    second: DustCloudAnimation_19
+  externalObjects: {}
+  serializedVersion: 11
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 64
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Windows Store Apps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: DustCloudAnimation_0
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 1068
+        width: 256
+        height: 212
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4f6477c2b522cf100800000000000000
+      internalID: 143027063152396020
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloudAnimation_1
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 1068
+        width: 256
+        height: 212
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3b15cdbe502b3e120800000000000000
+      internalID: 2441991161466606003
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloudAnimation_2
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 1068
+        width: 256
+        height: 212
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 19a0c07c050ae5210800000000000000
+      internalID: 1323671609290787473
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloudAnimation_3
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 1068
+        width: 256
+        height: 212
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9a761301193ba8350800000000000000
+      internalID: 6019821287557392297
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloudAnimation_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 812
+        width: 256
+        height: 212
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bbac75ddb11ce2eb0800000000000000
+      internalID: -4742641032152757573
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloudAnimation_5
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 812
+        width: 256
+        height: 212
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9a820de5fa8b63800800000000000000
+      internalID: 591863464395286697
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloudAnimation_6
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 812
+        width: 256
+        height: 212
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8afa10a354d141650800000000000000
+      internalID: 6202614769959153576
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloudAnimation_7
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 812
+        width: 256
+        height: 212
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2d8ffe800e70ed110800000000000000
+      internalID: 1287475202278553810
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloudAnimation_8
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 812
+        width: 256
+        height: 212
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0f42f0bd28b267d60800000000000000
+      internalID: 7887539638406948080
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloudAnimation_9
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 556
+        width: 256
+        height: 212
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 66f8c346de702a2b0800000000000000
+      internalID: -5574884672560918682
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloudAnimation_10
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 556
+        width: 256
+        height: 212
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 999cce25731f73bd0800000000000000
+      internalID: -2650384635767502439
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloudAnimation_11
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 556
+        width: 256
+        height: 212
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c66b681c438be9840800000000000000
+      internalID: 5232822353775736428
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloudAnimation_12
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 556
+        width: 256
+        height: 212
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2fe613f5ee5c1d490800000000000000
+      internalID: -7723174258373726478
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloudAnimation_13
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 556
+        width: 256
+        height: 212
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: abc85f118f8012ff0800000000000000
+      internalID: -62759058260259654
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloudAnimation_14
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 300
+        width: 256
+        height: 212
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6b64e2285f45cc640800000000000000
+      internalID: 5101545891331720886
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloudAnimation_15
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 300
+        width: 256
+        height: 212
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: aa574d8b7dd485350800000000000000
+      internalID: 6005635692012795306
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloudAnimation_16
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 300
+        width: 256
+        height: 212
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 822d6f68ec577b4d0800000000000000
+      internalID: -3118894687042743768
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloudAnimation_17
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 300
+        width: 256
+        height: 212
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f7fe3b04e2fddbe50800000000000000
+      internalID: 6826857999910563711
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloudAnimation_18
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 300
+        width: 256
+        height: 212
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 49bd33ee1c3eff930800000000000000
+      internalID: 4179309401287678868
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+  spritePackingTag: 
+  pSDRemoveMatte: 0
+  pSDShowRemoveMatteOption: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,579 @@
+fileFormatVersion: 2
+guid: 8a91a2c92071b704797dbce9dd094138
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -8616563826546764000
+    second: DustCloud_0
+  - first:
+      213: 5907667505228253434
+    second: DustCloud_1
+  - first:
+      213: 2185922343420879380
+    second: DustCloud_2
+  - first:
+      213: -6876793753669575689
+    second: DustCloud_3
+  - first:
+      213: 2021673053331997710
+    second: DustCloud_4
+  - first:
+      213: -7834690449711141087
+    second: DustCloud_5
+  - first:
+      213: 3188810437972381845
+    second: DustCloud_6
+  - first:
+      213: -5686535975742665079
+    second: DustCloud_7
+  - first:
+      213: 9132387063514898850
+    second: DustCloud_8
+  - first:
+      213: -5450879298829673978
+    second: DustCloud_9
+  - first:
+      213: -37862787530286280
+    second: DustCloud_10
+  - first:
+      213: 6947747123943436145
+    second: DustCloud_11
+  - first:
+      213: 316489297627496107
+    second: DustCloud_12
+  - first:
+      213: -1941619280130833287
+    second: DustCloud_13
+  - first:
+      213: 7152904206915388065
+    second: DustCloud_14
+  - first:
+      213: -1628975965516045591
+    second: DustCloud_15
+  - first:
+      213: 2792651521832760379
+    second: DustCloud_16
+  - first:
+      213: 6956251631301764346
+    second: DustCloud_17
+  - first:
+      213: 3726575242494954334
+    second: DustCloud_18
+  - first:
+      213: 2180612440577218201
+    second: DustCloud_19
+  externalObjects: {}
+  serializedVersion: 11
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 16
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Windows Store Apps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: DustCloud_0
+      rect:
+        serializedVersion: 2
+        x: 463
+        y: 1077
+        width: 42
+        height: 33
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 027133e2ad0db6880800000000000000
+      internalID: -8616563826546764000
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloud_1
+      rect:
+        serializedVersion: 2
+        x: 695
+        y: 1076
+        width: 61
+        height: 55
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: af88f3cbb404cf150800000000000000
+      internalID: 5907667505228253434
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloud_2
+      rect:
+        serializedVersion: 2
+        x: 929
+        y: 1076
+        width: 85
+        height: 83
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 412e0323ac4f55e10800000000000000
+      internalID: 2185922343420879380
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloud_3
+      rect:
+        serializedVersion: 2
+        x: 1174
+        y: 1076
+        width: 92
+        height: 110
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7fb56ee0488b090a0800000000000000
+      internalID: -6876793753669575689
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloud_4
+      rect:
+        serializedVersion: 2
+        x: 133
+        y: 821
+        width: 109
+        height: 116
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e0445d34eec6e0c10800000000000000
+      internalID: 2021673053331997710
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloud_5
+      rect:
+        serializedVersion: 2
+        x: 378
+        y: 821
+        width: 121
+        height: 108
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 12f62d3cb86954390800000000000000
+      internalID: -7834690449711141087
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloud_6
+      rect:
+        serializedVersion: 2
+        x: 626
+        y: 821
+        width: 129
+        height: 108
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 590d663c23ee04c20800000000000000
+      internalID: 3188810437972381845
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloud_7
+      rect:
+        serializedVersion: 2
+        x: 872
+        y: 821
+        width: 139
+        height: 104
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 98e016b98ad5511b0800000000000000
+      internalID: -5686535975742665079
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloud_8
+      rect:
+        serializedVersion: 2
+        x: 1115
+        y: 821
+        width: 152
+        height: 104
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2a1ad2816a1ccbe70800000000000000
+      internalID: 9132387063514898850
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloud_9
+      rect:
+        serializedVersion: 2
+        x: 91
+        y: 565
+        width: 148
+        height: 100
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 60a1abf58269a54b0800000000000000
+      internalID: -5450879298829673978
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloud_10
+      rect:
+        serializedVersion: 2
+        x: 345
+        y: 566
+        width: 150
+        height: 98
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 83b1d0fcefb797ff0800000000000000
+      internalID: -37862787530286280
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloud_11
+      rect:
+        serializedVersion: 2
+        x: 598
+        y: 565
+        width: 153
+        height: 99
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 17fe3efc23b5b6060800000000000000
+      internalID: 6947747123943436145
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloud_12
+      rect:
+        serializedVersion: 2
+        x: 849
+        y: 565
+        width: 158
+        height: 99
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: baebc40e655646400800000000000000
+      internalID: 316489297627496107
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloud_13
+      rect:
+        serializedVersion: 2
+        x: 1101
+        y: 565
+        width: 162
+        height: 99
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 97480c64d8bfd05e0800000000000000
+      internalID: -1941619280130833287
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloud_14
+      rect:
+        serializedVersion: 2
+        x: 76
+        y: 309
+        width: 163
+        height: 99
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1a2c69d7a78344360800000000000000
+      internalID: 7152904206915388065
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloud_15
+      rect:
+        serializedVersion: 2
+        x: 332
+        y: 309
+        width: 163
+        height: 99
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9e264c37df6b469e0800000000000000
+      internalID: -1628975965516045591
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloud_16
+      rect:
+        serializedVersion: 2
+        x: 588
+        y: 311
+        width: 163
+        height: 97
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b34bb4453cd71c620800000000000000
+      internalID: 2792651521832760379
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloud_17
+      rect:
+        serializedVersion: 2
+        x: 844
+        y: 309
+        width: 163
+        height: 99
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: af429fbb002998060800000000000000
+      internalID: 6956251631301764346
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DustCloud_18
+      rect:
+        serializedVersion: 2
+        x: 1100
+        y: 309
+        width: 163
+        height: 99
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e5b4da5507477b330800000000000000
+      internalID: 3726575242494954334
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+  spritePackingTag: 
+  pSDRemoveMatte: 0
+  pSDShowRemoveMatteOption: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

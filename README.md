@@ -40,7 +40,8 @@ Ftr-feature-name-Ptch-patch-name
 
 ### Work Environments
 
-For building the game, we will be using the latest version of unity, currently: 2021.1.5f1.
+For building the game, we will be using the latest version of unity, currently: 2021.1.5f1.<br/>
+Drawing will incllude the use of the latest version of Krita.
 
 
 
