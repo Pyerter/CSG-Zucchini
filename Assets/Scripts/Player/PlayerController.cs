@@ -487,7 +487,7 @@ public class PlayerController : MonoBehaviour
 
     public void DoGrapple(bool grappling)
     {
-        bool grappleLocekd = !u_CanGrapple || m_WasSlashing || m_WasDashing || !m_Animator.GetCurrentAnimatorStateInfo(1).IsName("Idle");
+        bool grappleLocekd = !u_CanGrapple || m_WasSlashing || m_EndingSlash || m_WasDashing || !m_Animator.GetCurrentAnimatorStateInfo(1).IsName("Idle");
         if (!grappleLocekd)
         {
             if (!m_WasGrappling && grappling)
@@ -742,6 +742,7 @@ public class PlayerController : MonoBehaviour
     {
         m_MovementSmoothing = m_InitialMovementSmooth;
         m_EndingSlash = false;
+        RefreshMovement();
     }
     
 }
