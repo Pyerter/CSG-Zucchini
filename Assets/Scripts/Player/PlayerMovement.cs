@@ -22,6 +22,8 @@ public class PlayerMovement : MonoBehaviour
 
     private bool requestingGrapple = false;
 
+    private bool requestingSlash = false;
+
     private void Awake()
     {
         controls = new InputMaster();
@@ -38,6 +40,9 @@ public class PlayerMovement : MonoBehaviour
 
         controls.Player.Grapple.started += _ => { requestingGrapple = true; };
         controls.Player.Grapple.canceled += _ => { requestingGrapple = false; };
+
+        controls.Player.Slash.started += _ => { requestingSlash = true; };
+        controls.Player.Slash.canceled += _ => { requestingSlash = false; };
     }
 
     private void OnEnable()
@@ -107,5 +112,11 @@ public class PlayerMovement : MonoBehaviour
         }
 
         controller.DoGrapple(requestingGrapple);
+
+        if (requestingSlash)
+        {
+            controller.DoSlash();
+            requestingSlash = false;
+        }
     }
 }

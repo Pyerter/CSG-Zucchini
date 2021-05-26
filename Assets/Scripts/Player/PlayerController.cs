@@ -16,6 +16,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float m_GrappleSpeedAccelerate = 0.2f;
     [Range(0, 1)] [SerializeField] private float m_CrouchSpeed = 0.5f;
     [Range(0, 0.3f)] [SerializeField] private float m_MovementSmoothing = 0.05f;
+    [Range(0.1f, 1f)] [SerializeField] private float m_LossMovementSmoothing = 0.7f;
+    private float m_InitialMovementSmooth;
     [Range(0, 0.5f)] [SerializeField] private float m_RotationLerp = 0.1f;
     private float m_GravMod; // value stores the grav mod for the rigidbody
     private Vector3 m_Velocity = Vector3.zero; // The movement velocity
@@ -48,12 +50,16 @@ public class PlayerController : MonoBehaviour
 
     // Dynamic references
     private GrappleHinge m_GrappleHinge;
+    private Enemy m_SlashTarget;
+    private Vector3 m_SlashDirection;
 
     // Size variables
     const float k_GroundedRadius = 0.4f; // Grounded detection radius
     const float k_WalledRadius = 0.1f; // Radius to detect wall latching
     const float k_CeilingRadius = 0.3f; // Ceiling detection radius
     const float k_GrappleRadius = 8f; // radius where the player can grapple within
+    const float k_SlashRadius = 5f; // radius where the player can dashslash
+    const float k_SlashSpacingDistance = 1f; // distance the player is opposite of slash origin, away from the target
 
     // State variables
     [HideInInspector] public bool m_Grounded; // Is grounded
@@ -65,6 +71,8 @@ public class PlayerController : MonoBehaviour
     private bool m_WasWalled = false; // if the player was wall latching
     private bool m_ShouldBounce = false; // if this is true, the player's y velocity will be bounced up
     public bool m_HasBounced = false; // if the controller already bounced and should not
+    private bool m_WasSlashing = false; // if the player is slashing through an enemy
+    private bool m_EndingSlash = false; // if the player is ending the slash
 
     // Timer variables
     private float m_JumpTime = 0f; // time the player jumped
@@ -99,6 +107,7 @@ public class PlayerController : MonoBehaviour
     private bool u_CanDash = true;
     private bool u_CanWallLatch = true;
     private bool u_CanGrapple = true;
+    private bool u_CanSlash = true;
     // - - -
 
     // When this object awakes
@@ -126,6 +135,7 @@ public class PlayerController : MonoBehaviour
         // set default values
         m_EquippedWeapon = Weapon.Fist;
         m_TargetRotation = transform.rotation;
+        m_InitialMovementSmooth = m_MovementSmoothing;
     }
 
     // Update is called once per frame
@@ -207,6 +217,8 @@ public class PlayerController : MonoBehaviour
         VerticalMovement(jump);
 
         CheckGrappleEnd();
+
+        CheckSlash();
 
     }
 
@@ -302,7 +314,10 @@ public class PlayerController : MonoBehaviour
 
         // Modify the x velocity based on grapple or not
         float xVelocity = move;
-        if (!m_WasGrappling)
+        if (m_WasSlashing)
+        {
+            xVelocity = 0;
+        } else if (!m_WasGrappling)
         {
             xVelocity = xVelocity * m_RunSpeed;
         } else
@@ -418,7 +433,7 @@ public class PlayerController : MonoBehaviour
     // Command the player to attack
     public void Attack(int dir)
     {
-        bool attackLocked = m_WasWalled || m_WasGrappling || m_WasDashing || !m_Animator.GetCurrentAnimatorStateInfo(1).IsName("Idle");
+        bool attackLocked = m_WasWalled || m_WasSlashing || m_WasGrappling || m_WasDashing || !m_Animator.GetCurrentAnimatorStateInfo(1).IsName("Idle");
         if (!attackLocked)
         {
             switch (m_EquippedWeapon)
@@ -461,7 +476,7 @@ public class PlayerController : MonoBehaviour
 
     public void DoDash()
     {
-        bool dashLocked = !u_CanDash || m_WasGrappling || !m_Animator.GetCurrentAnimatorStateInfo(1).IsName("Idle");
+        bool dashLocked = !u_CanDash || m_WasSlashing || m_WasGrappling || !m_Animator.GetCurrentAnimatorStateInfo(1).IsName("Idle");
         bool dashAvailable = m_RemainingDashes > 0 && Time.time > m_DashRefreshedTime && !m_Animator.GetCurrentAnimatorStateInfo(0).IsName("Dash");
         if (!dashLocked && dashAvailable)
         {
@@ -472,7 +487,7 @@ public class PlayerController : MonoBehaviour
 
     public void DoGrapple(bool grappling)
     {
-        bool grappleLocekd = !u_CanGrapple || m_WasDashing || !m_Animator.GetCurrentAnimatorStateInfo(1).IsName("Idle");
+        bool grappleLocekd = !u_CanGrapple || m_WasSlashing || m_WasDashing || !m_Animator.GetCurrentAnimatorStateInfo(1).IsName("Idle");
         if (!grappleLocekd)
         {
             if (!m_WasGrappling && grappling)
@@ -594,6 +609,139 @@ public class PlayerController : MonoBehaviour
             m_RigidBody2D.gravityScale = m_GravMod;
             m_Animator.SetBool("Walled", false);
         }
+    }
+
+    public void DoSlash()
+    {
+        Debug.Log("Trying slash...");
+        bool slashLocked = !u_CanSlash || m_WasDashing || !m_Animator.GetCurrentAnimatorStateInfo(1).IsName("Idle");
+
+        if (m_WasSlashing || m_EndingSlash || slashLocked)
+            return;
+
+        Collider2D[] collisions = Physics2D.OverlapCircleAll(gameObject.transform.position, k_SlashRadius, m_WhatIsPunched);
+        if (collisions.Length <= 0)
+            return;
+
+        List<Collider2D> collisionsList = new List<Collider2D>(collisions);
+        collisionsList.Sort((a, b) => { return (int)(Vector2.Distance(a.transform.position, gameObject.transform.position) - Vector2.Distance(b.transform.position, gameObject.transform.position)); });
+        foreach (Collider2D slashes in collisionsList)
+        {
+            if (slashes != null && slashes.TryGetComponent<Enemy>(out Enemy enemy))
+            {
+                Vector2 distanceTo = slashes.gameObject.transform.position - gameObject.transform.position;
+                distanceTo.Normalize();
+                if (distanceTo.y < 0 && m_Grounded)
+                    distanceTo.y = 0;
+                Vector2 bounds = enemy.GetComponent<Collider2D>().bounds.extents / 2;
+                float hitBoxSize = bounds.magnitude;
+                bounds = GetComponent<Collider2D>().bounds.extents / 2;
+                float hurtBoxSize = bounds.magnitude;
+                Vector2 raycastSlashDirection = distanceTo * (hitBoxSize * 2 + hurtBoxSize + k_SlashSpacingDistance);
+                Vector2 slashDirection = distanceTo * (hitBoxSize + hurtBoxSize + k_SlashSpacingDistance);
+                m_SlashDirection = new Vector3(slashDirection.x, slashDirection.y, 0);
+                m_SlashTarget = enemy;
+
+                bool pathObstructed = false;
+                RaycastHit2D[] rayHits = Physics2D.RaycastAll(gameObject.transform.position, m_SlashDirection, Vector2.Distance(gameObject.transform.position, enemy.transform.position));
+                foreach (RaycastHit2D ray in rayHits)
+                {
+                    bool obstructed = ray.collider != null && m_WhatIsGround.value == (m_WhatIsGround.value | (1 << ray.collider.gameObject.layer));
+                    if (obstructed)
+                    {
+                        pathObstructed = true;
+                        break;
+                    }
+                }
+                if (pathObstructed)
+                {
+                    m_SlashDirection = Vector3.zero;
+                    m_SlashTarget = null;
+                    continue;
+                }
+
+                bool spotObstructed = Physics2D.OverlapCircle(enemy.transform.position + m_SlashDirection, Math.Max(bounds.x, bounds.y), m_WhatIsGround);
+                if (spotObstructed)
+                {
+                    m_SlashDirection = Vector3.zero;
+                    m_SlashTarget = null;
+                    continue;
+                }
+
+                RaycastHit2D[] obstructions = new RaycastHit2D[5];
+                slashes.Raycast(raycastSlashDirection, obstructions, raycastSlashDirection.magnitude);
+
+                bool hits = false;
+                foreach (RaycastHit2D ray in obstructions)
+                {
+                    bool isObstruction = ray.collider != null && m_WhatIsGround.value == (m_WhatIsGround.value | (1 << ray.collider.gameObject.layer));
+                    if (isObstruction)
+                    {
+                        hits = true;
+                        //break;
+                    }
+                }
+
+                if (!hits)
+                {
+                    TryStartSlash();
+                    break;
+                } else
+                {
+                    m_SlashDirection = Vector3.zero;
+                    m_SlashTarget = null;
+                }
+
+            }
+        }
+    }
+
+    private void CheckSlash()
+    {
+        bool starting = m_Animator.GetCurrentAnimatorStateInfo(0).IsName("SlashStartUp");
+        bool ending = m_Animator.GetCurrentAnimatorStateInfo(0).IsName("Slashing");
+        bool slashing = starting || ending;
+        if (ending && !m_EndingSlash)
+        {
+            EndSlash();
+        } else if (!slashing && m_EndingSlash)
+        {
+            FinishSlash();
+        }
+    }
+
+    private void TryStartSlash()
+    {
+        if (m_WasWalled)
+            Unwall();
+
+        m_Animator.SetTrigger("Slash");
+        m_WasSlashing = true;
+        m_RigidBody2D.gravityScale = 0;
+        m_RigidBody2D.velocity = new Vector2(0, 0);
+    }
+
+    private void EndSlash()
+    {
+        m_WasSlashing = false;
+        m_RigidBody2D.gravityScale = m_GravMod;
+        m_RigidBody2D.position = m_SlashDirection + m_SlashTarget.transform.position;
+        m_RigidBody2D.velocity = m_SlashDirection.normalized * m_DashSpeed;
+        if (m_RigidBody2D.velocity.x > 0 && !m_FacingRight)
+        {
+            Flip();
+        } else if (m_RigidBody2D.velocity.x < 0 && m_FacingRight)
+        {
+            Flip();
+        }
+        m_MovementSmoothing = m_LossMovementSmoothing;
+        m_EndingSlash = true;
+    }
+
+    private void FinishSlash()
+    {
+        m_MovementSmoothing = m_InitialMovementSmooth;
+        m_EndingSlash = false;
     }
     
 }

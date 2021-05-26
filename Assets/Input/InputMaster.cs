@@ -57,6 +57,14 @@ public class @InputMaster : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""Slash"",
+                    ""type"": ""Button"",
+                    ""id"": ""70212dad-9251-46be-802d-c272b5066854"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -268,6 +276,39 @@ public class @InputMaster : IInputActionCollection, IDisposable
                     ""action"": ""Grapple"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8d63e3c7-1d2a-4a58-b39c-caea00ed8e49"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""Slash"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""63359ac5-d8f8-4178-bda4-258ff64bed23"",
+                    ""path"": ""<Keyboard>/k"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""Slash"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""cc24e820-ff33-4ef4-a65d-74151eb818a3"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Controller"",
+                    ""action"": ""Slash"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -303,6 +344,7 @@ public class @InputMaster : IInputActionCollection, IDisposable
         m_Player_Motion = m_Player.FindAction("Motion", throwIfNotFound: true);
         m_Player_Dash = m_Player.FindAction("Dash", throwIfNotFound: true);
         m_Player_Grapple = m_Player.FindAction("Grapple", throwIfNotFound: true);
+        m_Player_Slash = m_Player.FindAction("Slash", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -357,6 +399,7 @@ public class @InputMaster : IInputActionCollection, IDisposable
     private readonly InputAction m_Player_Motion;
     private readonly InputAction m_Player_Dash;
     private readonly InputAction m_Player_Grapple;
+    private readonly InputAction m_Player_Slash;
     public struct PlayerActions
     {
         private @InputMaster m_Wrapper;
@@ -366,6 +409,7 @@ public class @InputMaster : IInputActionCollection, IDisposable
         public InputAction @Motion => m_Wrapper.m_Player_Motion;
         public InputAction @Dash => m_Wrapper.m_Player_Dash;
         public InputAction @Grapple => m_Wrapper.m_Player_Grapple;
+        public InputAction @Slash => m_Wrapper.m_Player_Slash;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -390,6 +434,9 @@ public class @InputMaster : IInputActionCollection, IDisposable
                 @Grapple.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnGrapple;
                 @Grapple.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnGrapple;
                 @Grapple.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnGrapple;
+                @Slash.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSlash;
+                @Slash.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSlash;
+                @Slash.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSlash;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -409,6 +456,9 @@ public class @InputMaster : IInputActionCollection, IDisposable
                 @Grapple.started += instance.OnGrapple;
                 @Grapple.performed += instance.OnGrapple;
                 @Grapple.canceled += instance.OnGrapple;
+                @Slash.started += instance.OnSlash;
+                @Slash.performed += instance.OnSlash;
+                @Slash.canceled += instance.OnSlash;
             }
         }
     }
@@ -438,5 +488,6 @@ public class @InputMaster : IInputActionCollection, IDisposable
         void OnMotion(InputAction.CallbackContext context);
         void OnDash(InputAction.CallbackContext context);
         void OnGrapple(InputAction.CallbackContext context);
+        void OnSlash(InputAction.CallbackContext context);
     }
 }
