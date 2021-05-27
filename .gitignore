@@ -58,3 +58,8 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
+# Ignore Test Builds
+TestBuild/
+
+# Ignore Krita Backups
+*.kra~
