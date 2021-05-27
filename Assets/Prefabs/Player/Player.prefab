@@ -5185,7 +5185,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5396,6 +5396,7 @@ MonoBehaviour:
   m_WallSlideSpeed: 5
   m_GrappleMaxSpeed: 20
   m_GrappleSpeedAccelerate: 1.5
+  m_MaxGrappleSpeedChange: 5
   m_CrouchSpeed: 0.36
   m_MovementSmoothing: 0.05
   m_LossMovementSmoothing: 0.3
@@ -5434,6 +5435,10 @@ MonoBehaviour:
   OnCrouchEvent:
     m_PersistentCalls:
       m_Calls: []
+  u_CanDash: 1
+  u_CanWallLatch: 1
+  u_CanGrapple: 1
+  u_CanSlash: 1
 --- !u!50 &8895950251571058780
 Rigidbody2D:
   serializedVersion: 4
@@ -5449,7 +5454,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 2
+  m_GravityScale: 3
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
