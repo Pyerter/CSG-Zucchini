@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float m_WallSlideSpeed = 5f;
     [SerializeField] private float m_GrappleMaxSpeed = 60f;
     [SerializeField] private float m_GrappleSpeedAccelerate = 0.2f;
+    [SerializeField] private float m_MaxGrappleSpeedChange = 5f;
     [Range(0, 1)] [SerializeField] private float m_CrouchSpeed = 0.5f;
     [Range(0, 0.3f)] [SerializeField] private float m_MovementSmoothing = 0.05f;
     [Range(0.1f, 1f)] [SerializeField] private float m_LossMovementSmoothing = 0.7f;
@@ -115,10 +116,14 @@ public class PlayerController : MonoBehaviour
     public Action m_OnAttackIdle; // end of attack event
 
     // Variables pertaining to the ability to do stuff
-    private bool u_CanDash = true;
-    private bool u_CanWallLatch = true;
-    private bool u_CanGrapple = true;
-    private bool u_CanSlash = true;
+    [SerializeField] private bool u_CanDash = true;
+    public bool CanDash => u_CanDash;
+    [SerializeField] private bool u_CanWallLatch = true;
+    public bool CanWallLatch => u_CanWallLatch;
+    [SerializeField] private bool u_CanGrapple = true;
+    public bool CanGrapple => u_CanGrapple;
+    [SerializeField] private bool u_CanSlash = true;
+    public bool CanSlash => u_CanSlash;
     // - - -
 
     // When this object awakes
@@ -349,8 +354,21 @@ public class PlayerController : MonoBehaviour
         }
         // set the target horizontal velocity
         Vector3 targetVelocity = new Vector2(xVelocity, m_RigidBody2D.velocity.y);
+        Vector3 throwAway = m_RigidBody2D.velocity;
         // smooth towards it
-        m_RigidBody2D.velocity = Vector3.SmoothDamp(m_RigidBody2D.velocity, targetVelocity, ref m_Velocity, m_MovementSmoothing);
+        m_RigidBody2D.velocity = Vector3.SmoothDamp(m_RigidBody2D.velocity, targetVelocity, ref throwAway, m_MovementSmoothing);
+        if (m_WasGrappling)
+        {
+            Vector2 velDiff = m_RigidBody2D.velocity - (Vector2)m_Velocity;
+            if (velDiff.magnitude > m_MaxGrappleSpeedChange)
+            {
+                velDiff.Normalize();
+                velDiff *= m_MaxGrappleSpeedChange;
+                m_Velocity += (Vector3)velDiff;
+                m_RigidBody2D.velocity = m_Velocity;
+            }
+        }
+        m_Velocity = m_RigidBody2D.velocity;
     }
 
     private void VerticalMovement(bool jump)
@@ -554,7 +572,7 @@ public class PlayerController : MonoBehaviour
                 EndGrapple();
             } else
             {
-                float grappleWeight = Math.Abs(2 * m_RigidBody2D.velocity.magnitude / m_GrappleMaxSpeed);
+                float grappleWeight = Math.Abs(m_RigidBody2D.velocity.magnitude / m_GrappleMaxSpeed);
                 if (grappleWeight > 1)
                 {
                     grappleWeight = 1f;
