@@ -28,8 +28,8 @@ public class PlayerMovement : MonoBehaviour
     {
         controls = new InputMaster();
 
-        controls.Player.Jump.started += _ => { Debug.Log("JUMP"); requestJump = true; };
-        controls.Player.Jump.canceled += _ => { Debug.Log("NO JUMP"); requestJump = false; };
+        controls.Player.Jump.started += _ => { requestJump = true; };
+        controls.Player.Jump.canceled += _ => { requestJump = false; };
 
         controls.Player.Motion.performed += ctxt => { Vector2 vec = ctxt.ReadValue<Vector2>(); horizontalMove = vec.x * runSpeed; verticalMove = vec.y; };
         controls.Player.Motion.canceled += ctxt => { horizontalMove = 0; verticalMove = 0; };

@@ -6,6 +6,7 @@ public class Enemy : MonoBehaviour
 {
     public float m_MaxHealth = 10;
     float m_CurrentHealth;
+    public float m_Damage = 5f;
 
     // Start is called before the first frame update
     void Start()
@@ -28,5 +29,21 @@ public class Enemy : MonoBehaviour
         Debug.Log("Enemy Died");
 
         this.gameObject.SetActive(false);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.TryGetComponent<PlayerHurtBox>(out PlayerHurtBox controller))
+        {
+            controller.TriggerDamage(m_Damage, transform);
+        }
+    }
+
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (collision.TryGetComponent<PlayerHurtBox>(out PlayerHurtBox controller))
+        {
+            controller.TriggerDamage(m_Damage, transform);
+        }
     }
 }
